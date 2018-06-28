@@ -1,0 +1,14 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  background-color: #1E1E1E;
+  height: 100%;
+}
+
+#app {
+  height: 100%;
+}
+
+a {
+  color: inherit;
+}

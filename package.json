@@ -1,0 +1,10 @@
+{
+	"private": true,
+	"version": "0.1.0",
+	"license": "UNLICENSED",
+	"scripts": {},
+	"workspaces": [
+		"packages/pilot-server",
+		"packages/pilot-client"
+	]
+}
