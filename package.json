@@ -1,10 +1,15 @@
 {
-	"private": true,
-	"version": "0.1.0",
-	"license": "UNLICENSED",
-	"scripts": {},
-	"workspaces": [
-		"packages/pilot-server",
-		"packages/pilot-client"
-	]
+  "private": true,
+  "version": "0.1.0",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "concurrently 'cd ./packages/pilot-client && yarn start' 'cd ./packages/pilot-server && yarn start'"
+  },
+  "workspaces": [
+    "packages/pilot-server",
+    "packages/pilot-client"
+  ],
+  "devDependencies": {
+    "concurrently": "^4.0.1"
+  }
 }

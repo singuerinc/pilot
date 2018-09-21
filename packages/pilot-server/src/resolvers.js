@@ -1,6 +1,6 @@
 import Branches from './api/branches';
 import Commits from './api/commits';
-import Releases from './api/releases';
+import * as Releases from './api/releases';
 
 export const resolvers = {
   Query: {

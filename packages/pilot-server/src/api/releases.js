@@ -1,66 +1,88 @@
 import npm from 'npm';
-import { descend, keys, map, prop, reject, sortWith, values } from 'ramda';
+import {
+  compose,
+  descend,
+  keys,
+  map,
+  prop,
+  reject,
+  sortWith,
+  values
+} from 'ramda';
 
-export const sortByDate = sortWith([descend(prop('date'))]);
-
-export const type = x => {
-  if (/-alpha\./.test(x)) {
-    return 'alpha';
-  } else if (/-beta\./.test(x)) {
-    return 'beta';
-  } else {
-    return 'latest';
-  }
+const npmConf = {
+  registry: 'https://registry.npmjs.org/'
 };
 
-export const asRelease = time => vers => x => {
-  return {
-    _id: x,
-    version: x,
-    date: new Date(time[x]).getTime(),
-    tarball: '', //vers[x].dist.tarball,
-    type: type(x)
-  };
-};
+const sortByDate = sortWith([descend(prop('date'))]);
+
+const isAlpha = x => x.type === 'alpha';
+const isNotRelease = x => x === 'created' || x === 'modified';
+
+const isAlphaTag = x => /-alpha\./.test(x);
+const isBetaTag = x => /-beta\./.test(x);
+const typeByTag = x =>
+  isAlphaTag(x) ? 'alpha' : isBetaTag(x) ? 'beta' : 'release';
+
+const Release = (time, versions) => version => ({
+  _id: version,
+  version,
+  date: new Date(time[version]).getTime(),
+  tarball: '', //versions[version].dist.tarball,
+  type: typeByTag(version)
+});
 
 const load = async name => {
   return new Promise((resolve, reject) => {
-    npm.load({ registry: 'https://registry.npmjs.org/' }, () => {
-      npm.commands.view([name], true, (err, res) => {
+    npm.load(npmConf, () => {
+      const callback = (success, ups) => (err, res) => {
         if (err) {
-          reject(err);
+          ups(err);
         } else {
           const f = keys(res)[0];
-          resolve(res[f]);
+          success(res[f]);
         }
-      });
+      };
+      npm.commands.view([name], true, callback(resolve, reject));
     });
   });
 };
 
-export default {
-  async tags({ packageName }) {
-    const data = await load(packageName);
-    const { versions, time } = data;
+const tags = async ({ packageName }) => {
+  const data = await load(packageName);
+  const { versions, time } = data;
 
-    const isAlpha = x => x.type === 'alpha';
+  const toRelease = Release(time, versions);
 
-    const all = sortByDate(
-      map(asRelease(time)(versions), values(data['dist-tags']))
-    );
+  const parse = compose(
+    reject(isAlpha),
+    map(toRelease),
+    values
+  );
 
-    return reject(isAlpha, all);
-  },
+  return parse(data['dist-tags']);
+};
 
-  async find({ packageName }) {
-    const data = await load(packageName);
-    const { versions, time } = data;
+const find = async ({ packageName }) => {
+  const { versions, time } = await load(packageName);
 
-    const isNotRelease = x => x === 'created' || x === 'modified';
-    const artifacts = reject(isNotRelease, keys(time));
+  const artifacts = reject(isNotRelease)(keys(time));
 
-    const allSorted = sortByDate(map(asRelease(time)(versions), artifacts));
+  const parse = compose(
+    sortByDate,
+    map(Release(time, versions))
+  );
 
-    return allSorted;
-  }
+  return parse(artifacts);
+};
+
+export {
+  tags,
+  find,
+  isAlpha,
+  isNotRelease,
+  sortByDate,
+  Release,
+  typeByTag,
+  load
 };
