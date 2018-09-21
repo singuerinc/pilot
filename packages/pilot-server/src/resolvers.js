@@ -11,10 +11,10 @@ export const resolvers = {
       return await Commits.find({ project, repo, credentials });
     },
     async allReleases(_, { packageName }) {
-      return await Releases.find({ packageName });
+      return await Releases.find(Releases.load, { packageName });
     },
     async allReleaseTags(_, { packageName }) {
-      return await Releases.tags({ packageName });
+      return await Releases.tags(Releases.load, { packageName });
     }
   }
 };
