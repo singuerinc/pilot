@@ -1,28 +1,24 @@
 import npm from 'npm';
-import {
-  compose,
-  descend,
-  keys,
-  map,
-  prop,
-  reject,
-  sortWith,
-  values
-} from 'ramda';
+import * as R from 'ramda';
 
 const npmConf = {
   registry: 'https://registry.npmjs.org/'
 };
 
-const sortByDate = sortWith([descend(prop('date'))]);
+const releaseIsAlpha = R.compose(
+  R.equals('alpha'),
+  R.prop('type')
+);
 
-const isAlpha = x => x.type === 'alpha';
-const isNotRelease = x => x === 'created' || x === 'modified';
+const notVersionNum = R.either(R.equals('created'), R.equals('modified'));
+const isAlphaTag = R.test(/-alpha\./);
+const isBetaTag = R.test(/-beta\./);
 
-const isAlphaTag = x => /-alpha\./.test(x);
-const isBetaTag = x => /-beta\./.test(x);
-const typeByTag = x =>
-  isAlphaTag(x) ? 'alpha' : isBetaTag(x) ? 'beta' : 'release';
+const typeByTag = R.cond([
+  [isAlphaTag, R.always('alpha')],
+  [isBetaTag, R.always('beta')],
+  [R.T, R.always('release')]
+]);
 
 const Release = (time, versions) => version => ({
   _id: version,
@@ -39,7 +35,7 @@ const load = async name => {
         if (err) {
           ups(err);
         } else {
-          const f = keys(res)[0];
+          const f = R.keys(res)[0];
           success(res[f]);
         }
       };
@@ -54,10 +50,10 @@ const tags = async ({ packageName }) => {
 
   const toRelease = Release(time, versions);
 
-  const parse = compose(
-    reject(isAlpha),
-    map(toRelease),
-    values
+  const parse = R.compose(
+    R.reject(releaseIsAlpha),
+    R.map(toRelease),
+    R.values
   );
 
   return parse(data['dist-tags']);
@@ -65,24 +61,16 @@ const tags = async ({ packageName }) => {
 
 const find = async ({ packageName }) => {
   const { versions, time } = await load(packageName);
+  // time is: {'1.0.1': '2018-05-18T11:17:35.529Z'}
 
-  const artifacts = reject(isNotRelease)(keys(time));
-
-  const parse = compose(
-    sortByDate,
-    map(Release(time, versions))
+  const parse = R.compose(
+    R.sortWith([R.descend(R.prop('date'))]),
+    R.map(Release(time, versions)),
+    R.reject(notVersionNum),
+    R.keys
   );
 
-  return parse(artifacts);
+  return parse(time);
 };
 
-export {
-  tags,
-  find,
-  isAlpha,
-  isNotRelease,
-  sortByDate,
-  Release,
-  typeByTag,
-  load
-};
+export { tags, find, releaseIsAlpha, notVersionNum, Release, typeByTag, load };
