@@ -30,14 +30,24 @@ const load = async name => {
         if (err) {
           reject(err);
         } else {
-          const f = R.keys(res)[0];
-
           // {
-          //   versions  : ['1.0.0', '1.0.1', '1.1.0', ...],
-          //   time 		 : {'1.0.0': '2018-05-18T09:01:38.604Z', '1.0.1': ... },
-          //   dist-tags : { latest: '2.2.0' }
+          //  '2.2.0': {
+          //    _id: 'x@2.2.0',
+          //    name: 'x',
+          //    'dist-tags': {
+          //      latest: '2.2.0'
+          //    },
+          //    versions : ['1.0.0', '1.0.1', '1.1.0', ...],
+          //    time : {
+          //      created: '2018-05-18T09:01:38.604Z',
+          //      '1.0.0': '2018-05-18T09:01:38.604Z',
+          //      modified: '2018-05-18T09:01:38.604Z',
+          //      ...
+          //    },
+          //  }
           // }
 
+          const f = R.keys(res)[0];
           resolve(res[f]);
         }
       });
