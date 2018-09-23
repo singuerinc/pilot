@@ -5,41 +5,42 @@ const npmConf = {
   registry: 'https://registry.npmjs.org/'
 };
 
-const releaseIsAlpha = R.compose(
-  R.equals('alpha'),
-  R.prop('type')
-);
+const typeIsAlpha = x => x.type === 'alpha';
+const isCreatedOrModified = x => x === 'created' || x === 'modified';
 
-const notVersionNum = R.either(R.equals('created'), R.equals('modified'));
-const isAlphaTag = R.test(/-alpha\./);
-const isBetaTag = R.test(/-beta\./);
-
-const typeByTag = R.cond([
-  [isAlphaTag, R.always('alpha')],
-  [isBetaTag, R.always('beta')],
+const findTagType = R.cond([
+  [R.test(/-alpha\./), R.always('alpha')],
+  [R.test(/-beta\./), R.always('beta')],
   [R.T, R.always('release')]
 ]);
 
-const serialize = R.curry((time, versions, version) => ({
-  _id: version,
-  version,
-  date: new Date(time[version]).getTime(),
-  tarball: '', //versions[version].dist.tarball,
-  type: typeByTag(version)
+const serialize = R.curry((_, timestamps, tag) => ({
+  _id: tag,
+  version: tag,
+  date: new Date(timestamps[tag]).getTime(),
+  tarball: '', //versions[tag].dist.tarball,
+  type: findTagType(tag._id)
 }));
 
 const load = async name => {
   return new Promise((resolve, reject) => {
     npm.load(npmConf, () => {
-      const callback = (success, ups) => (err, res) => {
+      // @ts-ignore
+      npm.commands.view([name], true, (err, res) => {
         if (err) {
-          ups(err);
+          reject(err);
         } else {
           const f = R.keys(res)[0];
-          success(res[f]);
+
+          // {
+          //   versions  : ['1.0.0', '1.0.1', '1.1.0', ...],
+          //   time 		 : {'1.0.0': '2018-05-18T09:01:38.604Z', '1.0.1': ... },
+          //   dist-tags : { latest: '2.2.0' }
+          // }
+
+          resolve(res[f]);
         }
-      };
-      npm.commands.view([name], true, callback(resolve, reject));
+      });
     });
   });
 };
@@ -47,39 +48,32 @@ const load = async name => {
 const tags = async (load, { packageName }) => {
   const { versions, time, ...data } = await load(packageName);
 
-  // versions  => ['1.0.0', '1.0.1', '1.1.0', ...]
-  // time 		 => {'1.0.0': '2018-05-18T09:01:38.604Z', '1.0.1': ... }
-  // dist-tags => { latest: '2.2.0' }
-
-  const parse = R.compose(
-    R.map(serialize(time, versions)),
-    R.reject(releaseIsAlpha),
+  return R.compose(
+    // @ts-ignore
+    R.map(serialize(versions, time)),
+    R.reject(typeIsAlpha),
     R.values
-  );
-
-  return parse(data['dist-tags']);
+  )(data['dist-tags']);
 };
 
 const find = async (load, { packageName }) => {
   const { versions, time } = await load(packageName);
-  // time is: {'1.0.1': '2018-05-18T11:17:35.529Z'}
 
-  const parse = R.compose(
+  return R.compose(
     R.sortWith([R.descend(R.prop('date'))]),
-    R.map(serialize(time, versions)),
-    R.reject(notVersionNum),
+    // @ts-ignore
+    R.map(serialize(versions, time)),
+    R.reject(isCreatedOrModified),
     R.keys
-  );
-
-  return parse(time);
+  )(time);
 };
 
 export {
   tags,
   find,
   serialize,
-  releaseIsAlpha,
-  notVersionNum,
-  typeByTag,
+  typeIsAlpha,
+  isCreatedOrModified,
+  findTagType,
   load
 };
