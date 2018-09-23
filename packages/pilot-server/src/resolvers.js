@@ -7,14 +7,21 @@ export const resolvers = {
     async allBranches(_, { project, repo }, { credentials }) {
       return await Branches.find({ project, repo, credentials });
     },
+
     async allCommits(_, { project, repo }, { credentials }) {
       return await Commits.find({ project, repo, credentials });
     },
+
     async allReleases(_, { packageName }) {
-      return await Releases.find(Releases.load, { packageName });
+      const { versions, time } = await Releases.load(packageName);
+      return Releases.parseAll(Releases.isCreatedOrModified, versions)(time);
     },
+
     async allReleaseTags(_, { packageName }) {
-      return await Releases.tags(Releases.load, { packageName });
+      const { versions, time, ...data } = await Releases.load(packageName);
+      return Releases.parseTags(Releases.typeIsAlpha, versions, time)(
+        data['dist-tags']
+      );
     }
   }
 };

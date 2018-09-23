@@ -1,6 +1,7 @@
 import npm from 'npm';
 import * as R from 'ramda';
 
+// FIXME: should come from env variable or similar
 const npmConf = {
   registry: 'https://registry.npmjs.org/'
 };
@@ -8,6 +9,11 @@ const npmConf = {
 const typeIsAlpha = x => x.type === 'alpha';
 const isCreatedOrModified = x => x === 'created' || x === 'modified';
 
+/**
+ * Returns the type of release tag
+ * @example
+ * findTagType('0.1.0-beta.y04t1i8e'); // => 'beta'
+ */
 const findTagType = R.cond([
   [R.test(/-alpha\./), R.always('alpha')],
   [R.test(/-beta\./), R.always('beta')],
@@ -21,6 +27,23 @@ const serialize = R.curry((_, timestamps, tag) => ({
   tarball: '', //versions[tag].dist.tarball,
   type: findTagType(tag._id)
 }));
+
+const parseTags = (typeIsAlphaFn, versions, timestamps) =>
+  R.compose(
+    // @ts-ignore
+    R.map(serialize(versions, timestamps)),
+    R.reject(typeIsAlphaFn),
+    R.values
+  );
+
+const parseAll = (isCreatedOrModifiedFn, versions) =>
+  R.compose(
+    R.sortWith([R.descend(R.prop('date'))]),
+    // @ts-ignore
+    R.map(serialize(versions, time)),
+    R.reject(isCreatedOrModifiedFn),
+    R.keys
+  );
 
 const load = async name => {
   return new Promise((resolve, reject) => {
@@ -55,32 +78,9 @@ const load = async name => {
   });
 };
 
-const tags = async (load, { packageName }) => {
-  const { versions, time, ...data } = await load(packageName);
-
-  return R.compose(
-    // @ts-ignore
-    R.map(serialize(versions, time)),
-    R.reject(typeIsAlpha),
-    R.values
-  )(data['dist-tags']);
-};
-
-const find = async (load, { packageName }) => {
-  const { versions, time } = await load(packageName);
-
-  return R.compose(
-    R.sortWith([R.descend(R.prop('date'))]),
-    // @ts-ignore
-    R.map(serialize(versions, time)),
-    R.reject(isCreatedOrModified),
-    R.keys
-  )(time);
-};
-
 export {
-  tags,
-  find,
+  parseTags,
+  parseAll,
   serialize,
   typeIsAlpha,
   isCreatedOrModified,
