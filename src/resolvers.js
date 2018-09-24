@@ -3,22 +3,22 @@ import * as Commits from "./api/commits";
 import * as Releases from "./api/releases";
 import { headers, commitsUrl, branchesUrl } from "./utils";
 
-export const resolvers = (npm, get) => ({
+export const resolvers = (npm, axios) => ({
   Query: {
     async allBranches(_, { project, repo }, { credentials }) {
-      return Branches.find({
-        loadService: get,
-        url: branchesUrl(project, repo),
-        headers: headers(credentials)
-      });
+      return Branches.find(
+        axios.get,
+        branchesUrl(project, repo),
+        headers(credentials)
+      );
     },
 
     async allCommits(_, { project, repo }, { credentials }) {
-      return Commits.find({
-        loadService: get,
-        url: commitsUrl(project, repo, { limit: 50 }),
-        headers: headers(credentials)
-      });
+      return Commits.find(
+        axios.get,
+        commitsUrl(project, repo, { limit: 50 }),
+        headers(credentials)
+      );
     },
 
     async allReleases(_, { packageName }) {
