@@ -1,4 +1,3 @@
-import npm from 'npm';
 import * as R from 'ramda';
 
 // FIXME: should come from env variable or similar
@@ -65,10 +64,12 @@ const parseAllReleases = (isCreatedOrModifiedFn, versions) =>
  *     },
  *   }
  * }
+ * @param {*} npm
  * @param {string} name The package name
  */
-const load = async name => {
+const load = async (npm, name) => {
   return new Promise((resolve, reject) => {
+    // TODO: move this npmConf to params
     npm.load(npmConf(), () => {
       // @ts-ignore
       npm.commands.view([name], true, (err, res) => {

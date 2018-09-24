@@ -10,3 +10,9 @@ node_modules
 # Windows
 Thumbs.db
 Desktop.ini
+
+coverage
+.vscode
+.env
+
+dist

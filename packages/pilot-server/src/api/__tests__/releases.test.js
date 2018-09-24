@@ -1,4 +1,4 @@
-import { typeIsAlpha, isCreatedOrModified, serialize } from '../releases';
+import { load, typeIsAlpha, isCreatedOrModified, serialize } from '../releases';
 
 describe('releases', () => {
   describe('isAlpha', () => {
@@ -47,6 +47,48 @@ describe('releases', () => {
         tarball: '',
         type: 'release'
       });
+    });
+  });
+
+  describe('load', async () => {
+    it('should load all releases', async () => {
+      const npmStubOK = {
+        load: (_1, callback) => callback(),
+        commands: {
+          view: (_2, _3, callback) =>
+            callback(undefined, {
+              '0.0.1': {
+                'dist-tags': {},
+                time: {},
+                versions: {}
+              }
+            })
+        }
+      };
+
+      const res = await load(npmStubOK, 'foo');
+
+      expect(res).toStrictEqual({
+        versions: {},
+        time: {},
+        'dist-tags': {}
+      });
+    });
+
+    it('should fail to load releases', async () => {
+      const npmStubBad = {
+        load: (_1, callback) => callback(),
+        commands: {
+          view: (_2, _3, callback) => callback(new Error('error!'))
+        }
+      };
+
+      try {
+        await load(npmStubBad, 'foo');
+      } catch (e) {
+        expect(e).toBeInstanceOf(Error);
+        expect(e.message).toBe('error!');
+      }
     });
   });
 });

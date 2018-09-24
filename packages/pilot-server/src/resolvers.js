@@ -1,4 +1,5 @@
 import axios from 'axios';
+import npm from 'npm';
 import Branches from './api/branches';
 import * as Commits from './api/commits';
 import * as Releases from './api/releases';
@@ -19,14 +20,14 @@ export const resolvers = {
     },
 
     async allReleases(_, { packageName }) {
-      const { versions, time } = await Releases.load(packageName);
+      const { versions, time } = await Releases.load(npm, packageName);
       return Releases.parseAllReleases(Releases.isCreatedOrModified, versions)(
         time
       );
     },
 
     async allReleaseTags(_, { packageName }) {
-      const { versions, time, ...data } = await Releases.load(packageName);
+      const { versions, time, ...data } = await Releases.load(npm, packageName);
       return Releases.parseReleaseTags(Releases.typeIsAlpha, versions, time)(
         data['dist-tags']
       );
