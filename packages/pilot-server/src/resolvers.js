@@ -14,12 +14,14 @@ export const resolvers = {
 
     async allReleases(_, { packageName }) {
       const { versions, time } = await Releases.load(packageName);
-      return Releases.parseAll(Releases.isCreatedOrModified, versions)(time);
+      return Releases.parseAllReleases(Releases.isCreatedOrModified, versions)(
+        time
+      );
     },
 
     async allReleaseTags(_, { packageName }) {
       const { versions, time, ...data } = await Releases.load(packageName);
-      return Releases.parseTags(Releases.typeIsAlpha, versions, time)(
+      return Releases.parseReleaseTags(Releases.typeIsAlpha, versions, time)(
         data['dist-tags']
       );
     }

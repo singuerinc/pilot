@@ -2,15 +2,12 @@ import npm from 'npm';
 import * as R from 'ramda';
 
 // FIXME: should come from env variable or similar
-const npmConf = {
-  registry: 'https://registry.npmjs.org/'
-};
-
+const npmConf = () => ({ registry: 'https://registry.npmjs.org/' });
 const typeIsAlpha = x => x.type === 'alpha';
 const isCreatedOrModified = x => x === 'created' || x === 'modified';
 
 /**
- * Returns the type of release tag
+ * Returns the type of a release tag.
  * @example
  * findTagType('0.1.0-beta.y04t1i8e'); // => 'beta'
  */
@@ -20,6 +17,10 @@ const findTagType = R.cond([
   [R.T, R.always('release')]
 ]);
 
+/**
+ * Create an object version of a release mixing
+ * timestamp, version, tag type, etc.
+ */
 const serialize = R.curry((_, timestamps, tag) => ({
   _id: tag,
   version: tag,
@@ -28,7 +29,7 @@ const serialize = R.curry((_, timestamps, tag) => ({
   type: findTagType(tag._id)
 }));
 
-const parseTags = (typeIsAlphaFn, versions, timestamps) =>
+const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
   R.compose(
     // @ts-ignore
     R.map(serialize(versions, timestamps)),
@@ -36,7 +37,7 @@ const parseTags = (typeIsAlphaFn, versions, timestamps) =>
     R.values
   );
 
-const parseAll = (isCreatedOrModifiedFn, versions) =>
+const parseAllReleases = (isCreatedOrModifiedFn, versions) =>
   R.compose(
     R.sortWith([R.descend(R.prop('date'))]),
     // @ts-ignore
@@ -45,31 +46,36 @@ const parseAll = (isCreatedOrModifiedFn, versions) =>
     R.keys
   );
 
+/**
+ * Loads the package information from the registry.
+ * The response from the service looks similar to this one:
+ * {
+ *   '2.2.0': {
+ *     _id: 'x@2.2.0',
+ *     name: 'x',
+ *     'dist-tags': {
+ *       latest: '2.2.0'
+ *     },
+ *     versions : ['1.0.0', '1.0.1', '1.1.0', ...],
+ *     time : {
+ *       created: '2018-05-18T09:01:38.604Z',
+ *       '1.0.0': '2018-05-18T09:01:38.604Z',
+ *       modified: '2018-05-18T09:01:38.604Z',
+ *       ...
+ *     },
+ *   }
+ * }
+ * @param {string} name The package name
+ */
 const load = async name => {
   return new Promise((resolve, reject) => {
-    npm.load(npmConf, () => {
+    npm.load(npmConf(), () => {
       // @ts-ignore
       npm.commands.view([name], true, (err, res) => {
         if (err) {
           reject(err);
         } else {
-          // {
-          //  '2.2.0': {
-          //    _id: 'x@2.2.0',
-          //    name: 'x',
-          //    'dist-tags': {
-          //      latest: '2.2.0'
-          //    },
-          //    versions : ['1.0.0', '1.0.1', '1.1.0', ...],
-          //    time : {
-          //      created: '2018-05-18T09:01:38.604Z',
-          //      '1.0.0': '2018-05-18T09:01:38.604Z',
-          //      modified: '2018-05-18T09:01:38.604Z',
-          //      ...
-          //    },
-          //  }
-          // }
-
+          // Since the object has keys as index we need to extract the first one
           const f = R.keys(res)[0];
           resolve(res[f]);
         }
@@ -79,8 +85,8 @@ const load = async name => {
 };
 
 export {
-  parseTags,
-  parseAll,
+  parseReleaseTags,
+  parseAllReleases,
   serialize,
   typeIsAlpha,
   isCreatedOrModified,
