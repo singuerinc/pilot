@@ -1,23 +1,23 @@
-import axios from 'axios';
-import { map } from 'ramda';
-import { headers } from '../utils';
+import * as R from 'ramda';
+import { paramsToQuery } from '../utils';
 
-export const url = (project, repo, limit) => {
-  return `https://bitbucket.com/rest/api/1.0/projects/${project}/repos/${repo}/commits?limit=${limit}`;
+// FIXME: hard coded urls are always bad, get from config
+const url = (project, repo, { limit }) =>
+  `https://bitbucket.com/rest/api/1.0/projects/${project}/repos/${repo}/commits${paramsToQuery(
+    { limit }
+  )}`;
+
+// TODO: be sure that we can return null for date
+const serialize = x => ({
+  _id: x.id,
+  date: R.propOr(null, 'authorTimestamp', x)
+});
+
+// TODO: refactor, more FP way
+const find = async ({ loadService, url, headers }) => {
+  const { data } = await loadService(url, headers);
+
+  return R.map(serialize, data.values);
 };
 
-export default {
-  async find({ project, repo, credentials }) {
-    const { data } = await axios.get(
-      url(project, repo, 50),
-      headers(credentials)
-    );
-
-    const asCommit = x => ({
-      _id: x.id,
-      date: `${x.authorTimestamp}`
-    });
-
-    return map(asCommit, data.values);
-  }
-};
+export { url, serialize, find };

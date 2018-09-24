@@ -1,6 +1,8 @@
+import axios from 'axios';
 import Branches from './api/branches';
-import Commits from './api/commits';
+import * as Commits from './api/commits';
 import * as Releases from './api/releases';
+import { headers } from './utils';
 
 export const resolvers = {
   Query: {
@@ -9,7 +11,11 @@ export const resolvers = {
     },
 
     async allCommits(_, { project, repo }, { credentials }) {
-      return await Commits.find({ project, repo, credentials });
+      return await Commits.find({
+        loadService: axios.get,
+        url: Commits.url(project, repo, { limit: 50 }),
+        headers: headers(credentials)
+      });
     },
 
     async allReleases(_, { packageName }) {
