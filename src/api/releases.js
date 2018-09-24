@@ -25,7 +25,7 @@ const findTagType = R.cond([
  */
 const serialize = R.curry((versions, timestamps, version) => ({
   _id: version,
-  version: version,
+  version,
   date: new Date(timestamps[version]).getTime(),
   tarball: "", //versions[tag].dist.tarball,
   type: findTagType(version._id)

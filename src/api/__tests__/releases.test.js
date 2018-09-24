@@ -63,7 +63,7 @@ describe("releases", () => {
         load: (_1, callback) => callback(),
         commands: {
           view: (_2, _3, callback) =>
-            callback(undefined, {
+            callback(null, {
               "0.0.1": {
                 "dist-tags": {},
                 time: {},
