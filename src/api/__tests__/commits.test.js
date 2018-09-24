@@ -44,11 +44,11 @@ describe("commits", () => {
         values: [
           {
             id: "6bbe9aab7f181b919c884c25c468e7335bed47f5",
-            authorTimestamp: 1492612084000
+            authorTimestamp: 149261208
           },
           {
             id: "c10483a950c77565f8a4b7e533cb38fffc5b15d4",
-            authorTimestamp: 1492603117000
+            authorTimestamp: 149260311
           }
         ]
       };
@@ -60,11 +60,11 @@ describe("commits", () => {
       const expected = [
         {
           _id: "6bbe9aab7f181b919c884c25c468e7335bed47f5",
-          date: 1492612084000
+          date: 149261208
         },
         {
           _id: "c10483a950c77565f8a4b7e533cb38fffc5b15d4",
-          date: 1492603117000
+          date: 149260311
         }
       ];
 
