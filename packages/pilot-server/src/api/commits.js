@@ -1,4 +1,4 @@
-import * as R from 'ramda';
+import R from 'ramda';
 import { paramsToQuery } from '../utils';
 
 // FIXME: hard coded urls are always bad, get from config
@@ -14,9 +14,8 @@ const serialize = x => ({
 });
 
 // TODO: refactor, more FP way
-const find = async ({ loadService, url, headers }) => {
+const find = async (loadService, url, headers) => {
   const { data } = await loadService(url, headers);
-
   return R.map(serialize, data.values);
 };
 

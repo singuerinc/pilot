@@ -1,4 +1,4 @@
-import * as R from 'ramda';
+import R from 'ramda';
 
 // FIXME: should come from env variable or similar
 const npmConf = () => ({ registry: 'https://registry.npmjs.org/' });
@@ -19,15 +19,24 @@ const findTagType = R.cond([
 /**
  * Create an object version of a release mixing
  * timestamp, version, tag type, etc.
+ * @param {string[]} versions
+ * @param {object} timestamps
+ * @param {object} version
  */
-const serialize = R.curry((_, timestamps, tag) => ({
-  _id: tag,
-  version: tag,
-  date: new Date(timestamps[tag]).getTime(),
+const serialize = R.curry((versions, timestamps, version) => ({
+  _id: version,
+  version: version,
+  date: new Date(timestamps[version]).getTime(),
   tarball: '', //versions[tag].dist.tarball,
-  type: findTagType(tag._id)
+  type: findTagType(version._id)
 }));
 
+/**
+ * Creates a serialized version of each tag.
+ * @param {() => boolean} typeIsAlphaFn
+ * @param {string[]} versions
+ * @param {object} timestamps
+ */
 const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
   R.compose(
     // @ts-ignore
@@ -36,11 +45,17 @@ const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
     R.values
   );
 
-const parseAllReleases = (isCreatedOrModifiedFn, versions) =>
+/**
+ * Creates a serialized version of each release.
+ * @param {() => boolean} isCreatedOrModifiedFn
+ * @param {string[]} versions
+ * @param {object} timestamps
+ */
+const parseAllReleases = (isCreatedOrModifiedFn, versions, timestamps) =>
   R.compose(
     R.sortWith([R.descend(R.prop('date'))]),
     // @ts-ignore
-    R.map(serialize(versions, time)),
+    R.map(serialize(versions, timestamps)),
     R.reject(isCreatedOrModifiedFn),
     R.keys
   );

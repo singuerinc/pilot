@@ -8,11 +8,15 @@ import { headers } from './utils';
 export const resolvers = {
   Query: {
     async allBranches(_, { project, repo }, { credentials }) {
-      return await Branches.find({ project, repo, credentials });
+      return Branches.find({
+        loadService: axios.get,
+        url: Branches.url(project, repo),
+        headers: headers(credentials)
+      });
     },
 
     async allCommits(_, { project, repo }, { credentials }) {
-      return await Commits.find({
+      return Commits.find({
         loadService: axios.get,
         url: Commits.url(project, repo, { limit: 50 }),
         headers: headers(credentials)
@@ -20,17 +24,31 @@ export const resolvers = {
     },
 
     async allReleases(_, { packageName }) {
-      const { versions, time } = await Releases.load(npm, packageName);
-      return Releases.parseAllReleases(Releases.isCreatedOrModified, versions)(
-        time
-      );
+      try {
+        const { versions, time } = await Releases.load(npm, packageName);
+        return Releases.parseAllReleases(
+          Releases.isCreatedOrModified,
+          versions
+        )(time);
+      } catch (e) {
+        // TODO: figure out what we want return in case the we have an error
+        return Promise.reject([]);
+      }
     },
 
     async allReleaseTags(_, { packageName }) {
-      const { versions, time, ...data } = await Releases.load(npm, packageName);
-      return Releases.parseReleaseTags(Releases.typeIsAlpha, versions, time)(
-        data['dist-tags']
-      );
+      try {
+        const { versions, time, ...data } = await Releases.load(
+          npm,
+          packageName
+        );
+        return Releases.parseReleaseTags(Releases.typeIsAlpha, versions, time)(
+          data['dist-tags']
+        );
+      } catch (e) {
+        // TODO: figure out what we want return in case the we have an error
+        return Promise.reject([]);
+      }
     }
   }
 };

@@ -1,4 +1,11 @@
-import { load, typeIsAlpha, isCreatedOrModified, serialize } from '../releases';
+import {
+  load,
+  typeIsAlpha,
+  isCreatedOrModified,
+  parseReleaseTags,
+  parseAllReleases,
+  serialize
+} from '../releases';
 
 describe('releases', () => {
   describe('isAlpha', () => {
@@ -52,7 +59,7 @@ describe('releases', () => {
 
   describe('load', async () => {
     it('should load all releases', async () => {
-      const npmStubOK = {
+      const npmStubGood = {
         load: (_1, callback) => callback(),
         commands: {
           view: (_2, _3, callback) =>
@@ -66,7 +73,7 @@ describe('releases', () => {
         }
       };
 
-      const res = await load(npmStubOK, 'foo');
+      const res = await load(npmStubGood, 'foo');
 
       expect(res).toStrictEqual({
         versions: {},
@@ -89,6 +96,69 @@ describe('releases', () => {
         expect(e).toBeInstanceOf(Error);
         expect(e.message).toBe('error!');
       }
+    });
+  });
+
+  describe('parseReleaseTags', () => {
+    it('should parse the release tags', () => {
+      const versions = ['1.0.0', '1.0.1', '1.1.0'];
+      const timestamps = {
+        created: '2018-05-18T09:01:38.604Z',
+        '1.0.0': '2018-05-18T09:01:38.604Z',
+        modified: '2018-05-18T09:01:38.604Z'
+      };
+      const distTags = {
+        latest: '1.0.0'
+      };
+
+      const res = parseReleaseTags(typeIsAlpha, versions, timestamps)(distTags);
+      expect(res).toStrictEqual([
+        {
+          _id: '1.0.0',
+          version: '1.0.0',
+          date: 1526634098604,
+          tarball: '',
+          type: 'release'
+        }
+      ]);
+    });
+  });
+
+  describe('parseAllReleases', () => {
+    it('should parse the release tags', () => {
+      const versions = ['1.0.0', '1.0.1', '1.1.0'];
+      const timestamps = {
+        created: '2018-05-18T09:01:38.604Z',
+        '1.0.0': '2018-05-18T09:01:39.604Z',
+        '1.0.1': '2018-05-18T09:01:40.604Z',
+        '1.1.0': '2018-05-18T09:01:41.604Z',
+        modified: '2018-05-18T09:01:42.604Z'
+      };
+      const parse = parseAllReleases(isCreatedOrModified, versions, timestamps);
+
+      expect(parse(timestamps)).toStrictEqual([
+        {
+          _id: '1.1.0',
+          version: '1.1.0',
+          date: 1526634101604,
+          tarball: '',
+          type: 'release'
+        },
+        {
+          _id: '1.0.1',
+          version: '1.0.1',
+          date: 1526634100604,
+          tarball: '',
+          type: 'release'
+        },
+        {
+          _id: '1.0.0',
+          version: '1.0.0',
+          date: 1526634099604,
+          tarball: '',
+          type: 'release'
+        }
+      ]);
     });
   });
 });
