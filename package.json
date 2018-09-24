@@ -7,7 +7,9 @@
     "serve": "node dist/app.js",
     "format:fix": "npx prettier --write './src/**/*.js'",
     "test": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "devDependencies": {
     "@types/express": "4.16.0",
@@ -30,6 +32,8 @@
     "graphql-tag": "2.9.2",
     "graphql-tools": "3.0.2",
     "npm": "6.1.0",
-    "ramda": "0.25.0"
-  }
+    "ramda": "0.25.0",
+    "snyk": "^1.97.1"
+  },
+  "snyk": true
 }
