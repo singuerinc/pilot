@@ -1,9 +1,9 @@
-import R from 'ramda';
+import R from "ramda";
 
 // FIXME: should come from env variable or similar
-const npmConf = () => ({ registry: 'https://registry.npmjs.org/' });
-const typeIsAlpha = x => x.type === 'alpha';
-const isCreatedOrModified = x => x === 'created' || x === 'modified';
+const npmConf = () => ({ registry: "https://registry.npmjs.org/" });
+const typeIsAlpha = (x) => x.type === "alpha";
+const isCreatedOrModified = (x) => x === "created" || x === "modified";
 
 /**
  * Returns the type of a release tag.
@@ -11,9 +11,9 @@ const isCreatedOrModified = x => x === 'created' || x === 'modified';
  * findTagType('0.1.0-beta.y04t1i8e'); // => 'beta'
  */
 const findTagType = R.cond([
-  [R.test(/-alpha\./), R.always('alpha')],
-  [R.test(/-beta\./), R.always('beta')],
-  [R.T, R.always('release')]
+  [R.test(/-alpha\./), R.always("alpha")],
+  [R.test(/-beta\./), R.always("beta")],
+  [R.T, R.always("release")]
 ]);
 
 /**
@@ -27,7 +27,7 @@ const serialize = R.curry((versions, timestamps, version) => ({
   _id: version,
   version: version,
   date: new Date(timestamps[version]).getTime(),
-  tarball: '', //versions[tag].dist.tarball,
+  tarball: "", //versions[tag].dist.tarball,
   type: findTagType(version._id)
 }));
 
@@ -53,7 +53,7 @@ const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
  */
 const parseAllReleases = (isCreatedOrModifiedFn, versions, timestamps) =>
   R.compose(
-    R.sortWith([R.descend(R.prop('date'))]),
+    R.sortWith([R.descend(R.prop("date"))]),
     // @ts-ignore
     R.map(serialize(versions, timestamps)),
     R.reject(isCreatedOrModifiedFn),

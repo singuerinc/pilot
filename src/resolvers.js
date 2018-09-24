@@ -1,9 +1,9 @@
-import axios from 'axios';
-import npm from 'npm';
-import Branches from './api/branches';
-import * as Commits from './api/commits';
-import * as Releases from './api/releases';
-import { headers } from './utils';
+import axios from "axios";
+import npm from "npm";
+import Branches from "./api/branches";
+import * as Commits from "./api/commits";
+import * as Releases from "./api/releases";
+import { headers } from "./utils";
 
 export const resolvers = {
   Query: {
@@ -43,7 +43,7 @@ export const resolvers = {
           packageName
         );
         return Releases.parseReleaseTags(Releases.typeIsAlpha, versions, time)(
-          data['dist-tags']
+          data["dist-tags"]
         );
       } catch (e) {
         // TODO: figure out what we want return in case the we have an error

@@ -1,5 +1,5 @@
-import R from 'ramda';
-import { paramsToQuery } from '../utils';
+import R from "ramda";
+import { paramsToQuery } from "../utils";
 
 // FIXME: hard coded urls are always bad, get from config
 const url = (project, repo, { limit }) =>
@@ -8,9 +8,9 @@ const url = (project, repo, { limit }) =>
   )}`;
 
 // TODO: be sure that we can return null for date
-const serialize = x => ({
+const serialize = (x) => ({
   _id: x.id,
-  date: R.propOr(null, 'authorTimestamp', x)
+  date: R.propOr(null, "authorTimestamp", x)
 });
 
 // TODO: refactor, more FP way

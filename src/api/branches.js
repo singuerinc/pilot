@@ -1,6 +1,6 @@
-import axios from 'axios';
-import { map } from 'ramda';
-import { headers } from '../utils';
+import axios from "axios";
+import { map } from "ramda";
+import { headers } from "../utils";
 
 // FIXME: out!
 export const url = (project, repo) =>
@@ -10,7 +10,7 @@ export default {
   async find({ loadService, url, headers }) {
     const { data } = await loadService(url, headers);
 
-    const asBranch = x => ({
+    const asBranch = (x) => ({
       _id: x.id
     });
 
