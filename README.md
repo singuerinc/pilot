@@ -6,15 +6,13 @@ Aggregates information from NPM, Bitbucket among other services and exposes an A
 
 ## API
 
-Currently the are 4 endpoints in the API (Graphql based)
+<div style="display: flex; justify-items: center;">
+  <img width="80%" src="./docs/api.svg" style="margin: 0 auto;" />
+</div>
 
-![API](./docs/api.svg)
-
-```gql
-type Query {
-  allBranches: [Branch]
-  allCommits: [Commit]
-  allReleases(packageName: String!): [Release]
-  allReleaseTags(packageName: String!): [Release]
-}
-```
+| REST                                | Graphql                                         |
+| ----------------------------------- | ----------------------------------------------- |
+| /api/v2/branches?project=x1&repo=x2 | allBranches: [Branch]                           |
+| /api/v2/commits?project=x1&repo=x2  | allCommits: [Commit]                            |
+| /api/v2/releases/all?package=pkg1   | allReleases(packageName: String!): [Release]    |
+| /api/v2/releases/tags?package=pkg1  | allReleaseTags(packageName: String!): [Release] |
