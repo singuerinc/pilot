@@ -15,8 +15,12 @@ const serialize = (x) => ({
 
 // TODO: refactor, more FP way
 const find = async (loadService, url, headers) => {
-  const { data } = await loadService(url, headers);
-  return R.map(serialize, data.values);
+  try {
+    const { data } = await loadService(url, headers);
+    return R.map(serialize, data.values);
+  } catch (err) {
+    return err;
+  }
 };
 
 export { url, serialize, find };

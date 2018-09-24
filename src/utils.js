@@ -8,6 +8,7 @@ export const paramsToQuery = R.compose(
   R.toPairs
 );
 
-export const headers = (credentials) => ({
-  headers: { common: { Authorization: `Basic ${credentials}` } }
-});
+export const headers = R.compose(
+  R.assocPath(["headers", "common", "Authorization"], R.__, {}),
+  R.concat("Basic ")
+);

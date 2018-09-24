@@ -6,14 +6,11 @@ import { headers } from "../utils";
 export const url = (project, repo) =>
   `https://bitbucket.com/rest/api/1.0/projects/${project}/repos/${repo}/branches`;
 
-export default {
-  async find({ loadService, url, headers }) {
-    const { data } = await loadService(url, headers);
+export const serialize = (x) => ({
+  _id: x.displayId
+});
 
-    const asBranch = (x) => ({
-      _id: x.id
-    });
-
-    return map(asBranch, data.values);
-  }
+export const find = async (loadService, url, headers) => {
+  const { data } = await loadService(url, headers);
+  return map(serialize, data.values);
 };

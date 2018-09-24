@@ -52,10 +52,10 @@ describe("commits", () => {
           }
         ]
       };
-      const axiosGetStubGood = () => Promise.resolve({ data: response });
 
-      const mockUrl = url("PROJECT", "REPO", { limit: 100 });
-      const mockHeaders = {};
+      const axiosGetStubGood = () => Promise.resolve({ data: response });
+      const url = "https://foo.bar";
+      const headers = {};
 
       const expected = [
         {
@@ -68,9 +68,22 @@ describe("commits", () => {
         }
       ];
 
-      expect(
-        find(axiosGetStubGood, mockUrl, mockHeaders)
-      ).resolves.toStrictEqual(expected);
+      expect(find(axiosGetStubGood, url, headers)).resolves.toStrictEqual(
+        expected
+      );
+    });
+
+    it("should return an Error when the request fails", async () => {
+      const axiosGetStubBad = () => Promise.reject(new Error("oups!"));
+      const url = "https://foo.bar";
+      const headers = {};
+
+      try {
+        await find(axiosGetStubBad, url, headers);
+      } catch (e) {
+        expect(e).toBeInstanceOf(Error);
+        expect(e.message).toBe("oups!");
+      }
     });
   });
 });
