@@ -3,3 +3,18 @@
 # Pilot
 
 Aggregates information from NPM, Bitbucket among other services and exposes an API to keep an eye on your favourites npm packages.
+
+## API
+
+Currently the are 4 endpoints in the API (Graphql based)
+
+![API](./docs/api.svg)
+
+```gql
+type Query {
+  allBranches: [Branch]
+  allCommits: [Commit]
+  allReleases(packageName: String!): [Release]
+  allReleaseTags(packageName: String!): [Release]
+}
+```
