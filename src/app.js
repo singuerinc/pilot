@@ -3,16 +3,16 @@ import express from "express";
 import graphqlHTTP from "express-graphql";
 import cors from "cors";
 import schema from "./schema";
+import { buildCredentials } from "./utils";
 
 dotenv.config();
 
-const credentials = Buffer.from(
-  `${process.env.USERNAME}:${process.env.PASSWORD}`,
-  "ascii"
-).toString("base64");
-
 const app = express();
 const PORT = process.env.PORT || 3000;
+const credentials = buildCredentials(
+  process.env.USERNAME,
+  process.env.PASSWORD
+);
 
 app.use(cors());
 app.options("/graphql", cors());

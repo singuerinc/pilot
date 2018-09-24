@@ -1,4 +1,4 @@
-import { url, find, serialize } from "../commits";
+import { find, serialize } from "../commits";
 
 describe("commits", () => {
   describe("serialize", () => {
@@ -25,16 +25,6 @@ describe("commits", () => {
         _id: "123",
         date: null
       });
-    });
-  });
-
-  describe("url", () => {
-    it("should return a contructed url", () => {
-      const input = url("MY_PROJECT", "MY_REPO", { limit: 100 });
-      const expected =
-        "https://bitbucket.com/rest/api/1.0/projects/MY_PROJECT/repos/MY_REPO/commits?limit=100";
-
-      expect(input).toBe(expected);
     });
   });
 

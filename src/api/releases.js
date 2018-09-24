@@ -1,16 +1,16 @@
 import R from "ramda";
 
 // FIXME: should come from env variable or similar
-const npmConf = () => ({ registry: "https://registry.npmjs.org/" });
-const typeIsAlpha = (x) => x.type === "alpha";
-const isCreatedOrModified = (x) => x === "created" || x === "modified";
+export const npmConf = () => ({ registry: "https://registry.npmjs.org/" });
+export const typeIsAlpha = (x) => x.type === "alpha";
+export const isCreatedOrModified = (x) => x === "created" || x === "modified";
 
 /**
  * Returns the type of a release tag.
  * @example
  * findTagType('0.1.0-beta.y04t1i8e'); // => 'beta'
  */
-const findTagType = R.cond([
+export const findTagType = R.cond([
   [R.test(/-alpha\./), R.always("alpha")],
   [R.test(/-beta\./), R.always("beta")],
   [R.T, R.always("release")]
@@ -23,7 +23,7 @@ const findTagType = R.cond([
  * @param {object} timestamps
  * @param {object} version
  */
-const serialize = R.curry((versions, timestamps, version) => ({
+export const serialize = R.curry((versions, timestamps, version) => ({
   _id: version,
   version,
   date: new Date(timestamps[version]).getTime(),
@@ -37,7 +37,7 @@ const serialize = R.curry((versions, timestamps, version) => ({
  * @param {string[]} versions
  * @param {object} timestamps
  */
-const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
+export const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
   R.compose(
     // @ts-ignore
     R.map(serialize(versions, timestamps)),
@@ -51,7 +51,7 @@ const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
  * @param {string[]} versions
  * @param {object} timestamps
  */
-const parseAllReleases = (isCreatedOrModifiedFn, versions, timestamps) =>
+export const parseAllReleases = (isCreatedOrModifiedFn, versions, timestamps) =>
   R.compose(
     R.sortWith([R.descend(R.prop("date"))]),
     // @ts-ignore
@@ -82,7 +82,7 @@ const parseAllReleases = (isCreatedOrModifiedFn, versions, timestamps) =>
  * @param {*} npm
  * @param {string} name The package name
  */
-const load = async (npm, name) => {
+export const load = async (npm, name) => {
   return new Promise((resolve, reject) => {
     // TODO: move this npmConf to params
     npm.load(npmConf(), () => {
@@ -98,14 +98,4 @@ const load = async (npm, name) => {
       });
     });
   });
-};
-
-export {
-  parseReleaseTags,
-  parseAllReleases,
-  serialize,
-  typeIsAlpha,
-  isCreatedOrModified,
-  findTagType,
-  load
 };

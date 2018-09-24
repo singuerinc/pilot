@@ -1,3 +1,5 @@
+import axios from "axios";
+import npm from "npm";
 import { makeExecutableSchema } from "graphql-tools";
 import { resolvers } from "./resolvers";
 
@@ -29,5 +31,5 @@ const typeDefs = `
 
 export default makeExecutableSchema({
   typeDefs,
-  resolvers
+  resolvers: resolvers(npm, axios.get)
 });

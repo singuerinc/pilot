@@ -1,24 +1,22 @@
-import axios from "axios";
-import npm from "npm";
-import Branches from "./api/branches";
+import * as Branches from "./api/branches";
 import * as Commits from "./api/commits";
 import * as Releases from "./api/releases";
-import { headers } from "./utils";
+import { headers, commitsUrl, branchesUrl } from "./utils";
 
-export const resolvers = {
+export const resolvers = (npm, get) => ({
   Query: {
     async allBranches(_, { project, repo }, { credentials }) {
       return Branches.find({
-        loadService: axios.get,
-        url: Branches.url(project, repo),
+        loadService: get,
+        url: branchesUrl(project, repo),
         headers: headers(credentials)
       });
     },
 
     async allCommits(_, { project, repo }, { credentials }) {
       return Commits.find({
-        loadService: axios.get,
-        url: Commits.url(project, repo, { limit: 50 }),
+        loadService: get,
+        url: commitsUrl(project, repo, { limit: 50 }),
         headers: headers(credentials)
       });
     },
@@ -28,7 +26,8 @@ export const resolvers = {
         const { versions, time } = await Releases.load(npm, packageName);
         return Releases.parseAllReleases(
           Releases.isCreatedOrModified,
-          versions
+          versions,
+          time
         )(time);
       } catch (e) {
         // TODO: figure out what we want return in case the we have an error
@@ -51,4 +50,4 @@ export const resolvers = {
       }
     }
   }
-};
+});
