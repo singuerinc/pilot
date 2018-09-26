@@ -1,18 +1,13 @@
-import dotenv from "dotenv";
+import cors from "cors";
 import express from "express";
 import graphqlHTTP from "express-graphql";
-import cors from "cors";
+import cfg from "./config";
 import schema from "./schema";
 import { buildCredentials } from "./utils";
 
-dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 3000;
-const credentials = buildCredentials(
-  process.env.USERNAME,
-  process.env.PASSWORD
-);
+const credentials = buildCredentials(cfg.USERNAME, cfg.PASSWORD);
 
 app.use(cors());
 app.options("/graphql", cors());

@@ -1,7 +1,7 @@
 import * as Branches from "./api/branches";
 import * as Commits from "./api/commits";
 import * as Releases from "./api/releases";
-import { headers, commitsUrl, branchesUrl } from "./utils";
+import { branchesUrl, commitsUrl, headers } from "./utils";
 
 export const resolvers = (npm, axios) => ({
   Query: {

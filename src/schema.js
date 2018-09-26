@@ -22,8 +22,8 @@ const typeDefs = `
   }
 
   type Query {
-    allBranches: [Branch]
-    allCommits: [Commit]
+    allBranches(project: String!, repo: String!): [Branch]
+    allCommits(project: String!, repo: String!): [Commit]
     allReleases(packageName: String!): [Release]
     allReleaseTags(packageName: String!): [Release]
   }
@@ -31,5 +31,5 @@ const typeDefs = `
 
 export default makeExecutableSchema({
   typeDefs,
-  resolvers: resolvers(npm, axios.get)
+  resolvers: resolvers(npm, axios)
 });

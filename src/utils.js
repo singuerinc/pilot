@@ -1,27 +1,42 @@
-import R from "ramda";
+import always from "ramda/src/always";
+import assocPath from "ramda/src/assocPath";
+import compose from "ramda/src/compose";
+import concat from "ramda/src/concat";
+import ifElse from "ramda/src/ifElse";
+import join from "ramda/src/join";
+import length from "ramda/src/length";
+import map from "ramda/src/map";
+import prepend from "ramda/src/prepend";
+import replace from "ramda/src/replace";
+import toPairs from "ramda/src/toPairs";
+import __ from "ramda/src/__";
+import cfg from "./config";
 
-export const paramsToQuery = R.compose(
-  R.join(""),
-  R.ifElse(R.length, R.prepend("?"), R.always([])),
-  R.join("&"),
-  R.map(R.join("=")),
-  R.toPairs
+export const paramsToQuery = compose(
+  join(""),
+  ifElse(length, prepend("?"), always([])),
+  join("&"),
+  map(join("=")),
+  toPairs
 );
 
-export const headers = R.compose(
-  R.assocPath(["headers", "common", "Authorization"], R.__, {}),
-  R.concat("Basic ")
+export const headers = compose(
+  assocPath(["headers", "common", "Authorization"], __, {}),
+  concat("Basic ")
 );
 
 export const buildCredentials = (username, password) =>
   Buffer.from(`${username}:${password}`, "ascii").toString("base64");
 
-// FIXME: out!
 export const branchesUrl = (project, repo) =>
-  `https://bitbucket.com/rest/api/1.0/projects/${project}/repos/${repo}/branches`;
+  compose(
+    replace("%project%", project),
+    replace("%repo%", repo)
+  )(cfg.BITBUCKET_BRANCHES_URL);
 
-// FIXME: hard coded urls are always bad, get from config
 export const commitsUrl = (project, repo, { limit }) =>
-  `https://bitbucket.com/rest/api/1.0/projects/${project}/repos/${repo}/commits${paramsToQuery(
-    { limit }
-  )}`;
+  compose(
+    concat(__, paramsToQuery({ limit })),
+    replace("%project%", project),
+    replace("%repo%", repo)
+  )(cfg.BITBUCKET_COMMITS_URL);

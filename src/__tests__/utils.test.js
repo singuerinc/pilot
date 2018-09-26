@@ -1,10 +1,14 @@
 import {
-  paramsToQuery,
-  headers,
-  buildCredentials,
   branchesUrl,
-  commitsUrl
+  buildCredentials,
+  commitsUrl,
+  headers,
+  paramsToQuery
 } from "../utils";
+jest.mock("../config", () => ({
+  BITBUCKET_COMMITS_URL: "https://service/%project%/%repo%/commits",
+  BITBUCKET_BRANCHES_URL: "https://service/%project%/%repo%/branches"
+}));
 
 describe("utils", () => {
   describe("paramsToQuery", () => {
@@ -48,8 +52,7 @@ describe("utils", () => {
   describe("branchesUrl", () => {
     it("should return a contructed url", () => {
       const input = branchesUrl("MY_PROJECT", "MY_REPO");
-      const expected =
-        "https://bitbucket.com/rest/api/1.0/projects/MY_PROJECT/repos/MY_REPO/branches";
+      const expected = "https://service/MY_PROJECT/MY_REPO/branches";
 
       expect(input).toBe(expected);
     });
@@ -58,8 +61,7 @@ describe("utils", () => {
   describe("commitsUrl", () => {
     it("should return a contructed url", () => {
       const input = commitsUrl("MY_PROJECT", "MY_REPO", { limit: 100 });
-      const expected =
-        "https://bitbucket.com/rest/api/1.0/projects/MY_PROJECT/repos/MY_REPO/commits?limit=100";
+      const expected = "https://service/MY_PROJECT/MY_REPO/commits?limit=100";
 
       expect(input).toBe(expected);
     });
