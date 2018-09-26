@@ -5,10 +5,7 @@ import {
   headers,
   paramsToQuery
 } from "../utils";
-jest.mock("../config", () => ({
-  BITBUCKET_COMMITS_URL: "https://service/%project%/%repo%/commits",
-  BITBUCKET_BRANCHES_URL: "https://service/%project%/%repo%/branches"
-}));
+jest.mock("../config");
 
 describe("utils", () => {
   describe("paramsToQuery", () => {

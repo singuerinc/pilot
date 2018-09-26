@@ -12,6 +12,11 @@ import toPairs from "ramda/src/toPairs";
 import __ from "ramda/src/__";
 import cfg from "./config";
 
+/**
+ * Converts an object to a query string
+ * @example
+ * paramsToQuery({ foo: "bar", key: "value" }); // => "?foo=bar&key=value"
+ */
 export const paramsToQuery = compose(
   join(""),
   ifElse(length, prepend("?"), always([])),
@@ -20,23 +25,42 @@ export const paramsToQuery = compose(
   toPairs
 );
 
+/**
+ * Creates a http header object
+ */
 export const headers = compose(
   assocPath(["headers", "common", "Authorization"], __, {}),
   concat("Basic ")
 );
 
+/**
+ * Creates a base 64 string with the username/password
+ * @param {string} username
+ * @param {string} password
+ */
 export const buildCredentials = (username, password) =>
   Buffer.from(`${username}:${password}`, "ascii").toString("base64");
 
+/**
+ * Returns the url to get the branches info
+ * @param {string} project
+ * @param {string} repo
+ */
 export const branchesUrl = (project, repo) =>
   compose(
     replace("%project%", project),
     replace("%repo%", repo)
-  )(cfg.BITBUCKET_BRANCHES_URL);
+  )(cfg.BRANCHES_URL);
 
+/**
+ * Returns the url to get the commits info
+ * @param {string} project
+ * @param {string} repo
+ * @param {object} options
+ */
 export const commitsUrl = (project, repo, { limit }) =>
   compose(
     concat(__, paramsToQuery({ limit })),
     replace("%project%", project),
     replace("%repo%", repo)
-  )(cfg.BITBUCKET_COMMITS_URL);
+  )(cfg.COMMITS_URL);
