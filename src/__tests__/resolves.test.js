@@ -1,4 +1,5 @@
 import { resolvers } from "../resolvers";
+jest.mock("../config");
 
 const npmStubGood = {
   load: (_1, callback) => callback(),
