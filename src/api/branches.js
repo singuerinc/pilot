@@ -7,7 +7,8 @@ export const serialize = (x) => ({
 export const find = async (loadService, url, headers) => {
   try {
     const { data } = await loadService(url, headers);
-    return map(serialize, data.values);
+    const serialized = map(serialize, data.values);
+    return serialized;
   } catch (err) {
     return err;
   }

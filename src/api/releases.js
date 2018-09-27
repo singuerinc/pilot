@@ -11,9 +11,11 @@ import sortWith from "ramda/src/sortWith";
 import T from "ramda/src/T";
 import test from "ramda/src/test";
 import values from "ramda/src/values";
+import cfg from "../config";
 
-// FIXME: should come from env variable or similar
-export const npmConf = () => ({ registry: "https://registry.npmjs.org/" });
+export const npmConf = () => ({
+  registry: cfg.NPM_REGISTRY
+});
 export const typeIsAlpha = (x) => x.type === "alpha";
 export const isCreatedOrModified = (x) => x === "created" || x === "modified";
 
@@ -100,6 +102,7 @@ export const load = async (npm, name) => {
     npm.load(npmConf(), () => {
       // @ts-ignore
       npm.commands.view([name], true, (err, res) => {
+        console.log(err);
         if (err) {
           reject(err);
         } else {
