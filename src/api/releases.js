@@ -8,6 +8,7 @@ import map from "ramda/src/map";
 import prop from "ramda/src/prop";
 import reject from "ramda/src/reject";
 import sortWith from "ramda/src/sortWith";
+import tap from "ramda/src/tap";
 import T from "ramda/src/T";
 import test from "ramda/src/test";
 import values from "ramda/src/values";
@@ -17,6 +18,8 @@ export const npmConf = () => ({
   registry: cfg.NPM_REGISTRY
 });
 export const typeIsAlpha = (x) => x.type === "alpha";
+export const typeIsBeta = (x) => x.type === "beta";
+export const typeIsRelease = (x) => !typeIsAlpha(x) && !typeIsBeta(x);
 export const isCreatedOrModified = (x) => x === "created" || x === "modified";
 
 /**
@@ -42,7 +45,7 @@ export const serialize = curry((versions, timestamps, version) => ({
   version,
   date: new Date(timestamps[version]).getTime(),
   tarball: "", //versions[tag].dist.tarball,
-  type: findTagType(version._id)
+  type: findTagType(version)
 }));
 
 /**
@@ -55,6 +58,7 @@ export const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
   compose(
     // @ts-ignore
     map(serialize(versions, timestamps)),
+    tap(console.log.bind(console)),
     reject(typeIsAlphaFn),
     values
   );
