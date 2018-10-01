@@ -1,7 +1,9 @@
 import map from "ramda/src/map";
+import applySpec from "ramda/src/applySpec";
+import prop from "ramda/src/prop";
 
-export const serialize = (x) => ({
-  _id: x.displayId
+export const serialize = applySpec({
+  _id: prop("displayId")
 });
 
 export const find = async (loadService, url, headers) => {

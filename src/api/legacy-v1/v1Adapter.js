@@ -1,64 +1,59 @@
-import map from "ramda/src/map";
-import find from "ramda/src/find";
+import always from "ramda/src/always";
+import applySpec from "ramda/src/applySpec";
 import compose from "ramda/src/compose";
+import find from "ramda/src/find";
+import map from "ramda/src/map";
 import prop from "ramda/src/prop";
 import propOr from "ramda/src/propOr";
-import exampleREST from "../../exampleREST";
+import config from "../../config";
 import { resolvers } from "../../resolvers";
 import { typeIsAlpha, typeIsBeta, typeIsRelease } from "../releases";
-import { buildCredentials } from "../../utils";
-import config from "../../config";
 
 export const getId = propOr("", "_id");
 export const findAlpha = find(typeIsAlpha);
 export const findBeta = find(typeIsBeta);
 export const findLatest = find(typeIsRelease);
+export const findAndGetId = (predicate) =>
+  compose(
+    getId,
+    predicate
+  );
+export const findAndSerialize = (predicate) =>
+  compose(
+    serializeRelease,
+    predicate
+  );
 export const toISOString = (x) => new Date(x).toISOString();
 
-export const serializeRelease = (raw) => ({
-  version: prop("version")(raw),
-  time: toISOString(raw.date),
-  tarball: prop("tarball")(raw)
+export const serializeRelease = applySpec({
+  version: prop("version"),
+  time: compose(
+    toISOString,
+    prop("date")
+  ),
+  tarball: prop("tarball")
 });
 
-export const latestTags = (raw) => ({
-  alpha: compose(
-    serializeRelease,
-    findAlpha
-  )(raw),
-  beta: compose(
-    serializeRelease,
-    findBeta
-  )(raw),
-  latest: compose(
-    serializeRelease,
-    findLatest
-  )(raw)
+export const latestTags = applySpec({
+  alpha: findAndSerialize(findAlpha),
+  beta: findAndSerialize(findBeta),
+  latest: findAndSerialize(findLatest)
 });
 
-export const serializeTags = (raw) => ({
-  alpha: compose(
-    getId,
-    findAlpha
-  )(raw),
-  beta: compose(
-    getId,
-    findBeta
-  )(raw),
-  latest: compose(
-    getId,
-    findLatest
-  )(raw)
+export const serializeTags = applySpec({
+  alpha: findAndGetId(findAlpha),
+  beta: findAndGetId(findBeta),
+  latest: findAndGetId(findLatest)
 });
 
-export const serializeBranch = (x) => ({
-  displayId: getId(x),
+export const serializeBranch = applySpec({
+  displayId: getId,
   // TODO: add all this info
-  package: "",
+  package: always(""),
   artifact: {
-    time: "",
-    version: "",
-    tarball: ""
+    time: always(""),
+    version: always(""),
+    tarball: always("")
   }
 });
 
@@ -99,14 +94,13 @@ export function fetch(
 
   return calls
     .then(([versions, tags, branches]) => {
-      console.log(tags);
       return {
-        // ...exampleREST,
         artifacts: {
           tags: serializeTags(tags),
           versions
         },
         branches,
+        pullRequests: {},
         project: {
           domain: "http://domain/", //FIXME: get this info from somewhere
           packageName,

@@ -3,12 +3,13 @@ import compose from "ramda/src/compose";
 import cond from "ramda/src/cond";
 import curry from "ramda/src/curry";
 import descend from "ramda/src/descend";
+import equals from "ramda/src/equals";
+import head from "ramda/src/head";
 import keys from "ramda/src/keys";
 import map from "ramda/src/map";
 import prop from "ramda/src/prop";
 import reject from "ramda/src/reject";
 import sortWith from "ramda/src/sortWith";
-import tap from "ramda/src/tap";
 import T from "ramda/src/T";
 import test from "ramda/src/test";
 import values from "ramda/src/values";
@@ -17,8 +18,20 @@ import cfg from "../config";
 export const npmConf = () => ({
   registry: cfg.NPM_REGISTRY
 });
-export const typeIsAlpha = (x) => x.type === "alpha";
-export const typeIsBeta = (x) => x.type === "beta";
+
+/**
+ * @returns boolean
+ */
+export const typeIsAlpha = compose(
+  equals("alpha"),
+  prop("type")
+);
+
+export const typeIsBeta = compose(
+  equals("beta"),
+  prop("type")
+);
+
 export const typeIsRelease = (x) => !typeIsAlpha(x) && !typeIsBeta(x);
 export const isCreatedOrModified = (x) => x === "created" || x === "modified";
 
@@ -50,13 +63,12 @@ export const serialize = curry((versions, timestamps, version) => ({
 
 /**
  * Creates a serialized version of each tag.
- * @param {() => boolean} typeIsAlphaFn
+ * @param {Function} typeIsAlphaFn
  * @param {string[]} versions
  * @param {object} timestamps
  */
 export const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
   compose(
-    // @ts-ignore
     map(serialize(versions, timestamps)),
     reject(typeIsAlphaFn),
     values
@@ -64,14 +76,13 @@ export const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
 
 /**
  * Creates a serialized version of each release.
- * @param {() => boolean} isCreatedOrModifiedFn
+ * @param {Function} isCreatedOrModifiedFn
  * @param {string[]} versions
  * @param {object} timestamps
  */
 export const parseAllReleases = (isCreatedOrModifiedFn, versions, timestamps) =>
   compose(
     sortWith([descend(prop("date"))]),
-    // @ts-ignore
     map(serialize(versions, timestamps)),
     reject(isCreatedOrModifiedFn),
     keys
@@ -109,7 +120,7 @@ export const load = async (npm, name) => {
           reject(err);
         } else {
           // Since the object has keys as index we need to extract the first one
-          const f = keys(res)[0];
+          const f = head(keys(res));
           resolve(res[f]);
         }
       });
