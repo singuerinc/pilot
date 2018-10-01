@@ -2,10 +2,17 @@ import axios from "axios";
 import npm from "npm";
 import always from "ramda/src/always";
 import has from "ramda/src/has";
-import reject from "ramda/src/reject";
-import isNil from "ramda/src/isNil";
 import ifElse from "ramda/src/ifElse";
-import { fetch } from "./api/legacy-v1/v1Adapter";
+import isNil from "ramda/src/isNil";
+import reject from "ramda/src/reject";
+import {
+  artifacts,
+  branches,
+  fetch,
+  serializeTags,
+  tags
+} from "./api/legacy-v1/v1Adapter";
+import { buildCredentials } from "./utils";
 
 const validate = (prop) =>
   ifElse(has(prop), always(null), always(`Parameter '${prop}' is missing.`));
@@ -21,6 +28,11 @@ const v1_dashboard = async (req, res) => {
     const data = await fetch(
       npm,
       axios,
+      artifacts,
+      tags,
+      branches,
+      buildCredentials,
+      serializeTags,
       req.query.package,
       req.query.project,
       req.query.repo

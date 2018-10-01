@@ -58,7 +58,6 @@ export const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
   compose(
     // @ts-ignore
     map(serialize(versions, timestamps)),
-    tap(console.log.bind(console)),
     reject(typeIsAlphaFn),
     values
   );
@@ -106,7 +105,6 @@ export const load = async (npm, name) => {
     npm.load(npmConf(), () => {
       // @ts-ignore
       npm.commands.view([name], true, (err, res) => {
-        console.log(err);
         if (err) {
           reject(err);
         } else {
