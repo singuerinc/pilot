@@ -24,6 +24,13 @@ export const resolvers = (npm, axios) => ({
     async allReleases(_, { packageName }) {
       try {
         const { versions, time } = await Releases.load(npm, packageName);
+
+        versions
+          // .map((key) => versions[key])
+          .forEach((x) => {
+            console.log(x);
+          });
+
         return Releases.parseAllReleases(
           Releases.isCreatedOrModified,
           versions,

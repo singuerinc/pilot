@@ -89,22 +89,23 @@ export function fetch(
   return calls
     .then(([versions, tags, branches]) => {
       return {
-        artifacts: {
-          tags: serializeTags(tags),
-          versions
-        },
-        branches,
-        pullRequests: {},
         project: {
           domain: "http://domain/", //FIXME: get this info from somewhere
           packageName,
           project,
           repo
         },
-        tags: latestTags(tags)
+        branches,
+        tags: latestTags(tags),
+        artifacts: {
+          tags: serializeTags(tags),
+          versions: R.take(10, versions) //FIXME: should take all. not 10
+        },
+        pullRequests: {}
       };
     })
-    .catch(() => {
+    .catch((e) => {
+      console.log(e);
       return { error: 1 };
     });
 }

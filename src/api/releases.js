@@ -39,8 +39,9 @@ export const findTagType = R.cond([
 export const serialize = R.curry((versions, timestamps, version) => ({
   _id: version,
   version,
+  time: timestamps[version],
   date: new Date(timestamps[version]).getTime(),
-  tarball: "", //versions[tag].dist.tarball,
+  tarball: versions[0],
   type: findTagType(version)
 }));
 
@@ -66,8 +67,10 @@ export const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
 export const parseAllReleases = (isCreatedOrModifiedFn, versions, timestamps) =>
   R.compose(
     R.sortWith([R.descend(R.prop("date"))]),
+    // R.tap(console.log.bind(console)),
     R.map(serialize(versions, timestamps)),
     R.reject(isCreatedOrModifiedFn),
+    // R.map(R.tap(console.log.bind(console))),
     R.keys
   );
 
