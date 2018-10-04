@@ -1,10 +1,6 @@
 import axios from "axios";
 import npm from "npm";
-import always from "ramda/src/always";
-import has from "ramda/src/has";
-import ifElse from "ramda/src/ifElse";
-import isNil from "ramda/src/isNil";
-import reject from "ramda/src/reject";
+import * as R from "ramda";
 import {
   artifacts,
   branches,
@@ -15,10 +11,14 @@ import {
 import { buildCredentials } from "./utils";
 
 const validate = (prop) =>
-  ifElse(has(prop), always(null), always(`Parameter '${prop}' is missing.`));
+  R.ifElse(
+    R.has(prop),
+    R.always(null),
+    R.always(`Parameter '${prop}' is missing.`)
+  );
 
 const v1_dashboard = async (req, res) => {
-  const errors = reject(isNil, [
+  const errors = R.reject(R.isNil, [
     validate("package")(req.query),
     validate("project")(req.query),
     validate("repo")(req.query)

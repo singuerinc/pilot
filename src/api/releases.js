@@ -1,35 +1,18 @@
-import always from "ramda/src/always";
-import compose from "ramda/src/compose";
-import cond from "ramda/src/cond";
-import curry from "ramda/src/curry";
-import descend from "ramda/src/descend";
-import equals from "ramda/src/equals";
-import head from "ramda/src/head";
-import keys from "ramda/src/keys";
-import map from "ramda/src/map";
-import prop from "ramda/src/prop";
-import reject from "ramda/src/reject";
-import sortWith from "ramda/src/sortWith";
-import T from "ramda/src/T";
-import test from "ramda/src/test";
-import values from "ramda/src/values";
+import * as R from "ramda";
 import cfg from "../config";
 
 export const npmConf = () => ({
   registry: cfg.NPM_REGISTRY
 });
 
-/**
- * @returns boolean
- */
-export const typeIsAlpha = compose(
-  equals("alpha"),
-  prop("type")
+export const typeIsAlpha = R.compose(
+  R.equals("alpha"),
+  R.prop("type")
 );
 
-export const typeIsBeta = compose(
-  equals("beta"),
-  prop("type")
+export const typeIsBeta = R.compose(
+  R.equals("beta"),
+  R.prop("type")
 );
 
 export const typeIsRelease = (x) => !typeIsAlpha(x) && !typeIsBeta(x);
@@ -40,10 +23,10 @@ export const isCreatedOrModified = (x) => x === "created" || x === "modified";
  * @example
  * findTagType('0.1.0-beta.y04t1i8e'); // => 'beta'
  */
-export const findTagType = cond([
-  [test(/-alpha\./), always("alpha")],
-  [test(/-beta\./), always("beta")],
-  [T, always("release")]
+export const findTagType = R.cond([
+  [R.test(/-alpha\./), R.always("alpha")],
+  [R.test(/-beta\./), R.always("beta")],
+  [R.T, R.always("release")]
 ]);
 
 /**
@@ -53,7 +36,7 @@ export const findTagType = cond([
  * @param {object} timestamps
  * @param {object} version
  */
-export const serialize = curry((versions, timestamps, version) => ({
+export const serialize = R.curry((versions, timestamps, version) => ({
   _id: version,
   version,
   date: new Date(timestamps[version]).getTime(),
@@ -68,10 +51,10 @@ export const serialize = curry((versions, timestamps, version) => ({
  * @param {object} timestamps
  */
 export const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
-  compose(
-    map(serialize(versions, timestamps)),
-    reject(typeIsAlphaFn),
-    values
+  R.compose(
+    R.map(serialize(versions, timestamps)),
+    R.reject(typeIsAlphaFn),
+    R.values
   );
 
 /**
@@ -81,11 +64,11 @@ export const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
  * @param {object} timestamps
  */
 export const parseAllReleases = (isCreatedOrModifiedFn, versions, timestamps) =>
-  compose(
-    sortWith([descend(prop("date"))]),
-    map(serialize(versions, timestamps)),
-    reject(isCreatedOrModifiedFn),
-    keys
+  R.compose(
+    R.sortWith([R.descend(R.prop("date"))]),
+    R.map(serialize(versions, timestamps)),
+    R.reject(isCreatedOrModifiedFn),
+    R.keys
   );
 
 /**
@@ -120,7 +103,7 @@ export const load = async (npm, name) => {
           reject(err);
         } else {
           // Since the object has keys as index we need to extract the first one
-          const f = head(keys(res));
+          const f = R.head(R.keys(res));
           resolve(res[f]);
         }
       });

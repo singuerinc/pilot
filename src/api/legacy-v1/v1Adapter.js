@@ -1,64 +1,58 @@
-import always from "ramda/src/always";
-import applySpec from "ramda/src/applySpec";
-import compose from "ramda/src/compose";
-import find from "ramda/src/find";
-import map from "ramda/src/map";
-import prop from "ramda/src/prop";
-import propOr from "ramda/src/propOr";
+import * as R from "ramda";
 import config from "../../config";
 import { resolvers } from "../../resolvers";
 import { typeIsAlpha, typeIsBeta, typeIsRelease } from "../releases";
 
-export const getId = propOr("", "_id");
-export const findAlpha = find(typeIsAlpha);
-export const findBeta = find(typeIsBeta);
-export const findLatest = find(typeIsRelease);
+export const getId = R.propOr("", "_id");
+export const findAlpha = R.find(typeIsAlpha);
+export const findBeta = R.find(typeIsBeta);
+export const findLatest = R.find(typeIsRelease);
 export const findAndGetId = (predicate) =>
-  compose(
+  R.compose(
     getId,
     predicate
   );
 export const findAndSerialize = (predicate) =>
-  compose(
+  R.compose(
     serializeRelease,
     predicate
   );
 export const toISOString = (x) => new Date(x).toISOString();
 
-export const serializeRelease = applySpec({
-  version: prop("version"),
-  time: compose(
+export const serializeRelease = R.applySpec({
+  version: R.prop("version"),
+  time: R.compose(
     toISOString,
-    prop("date")
+    R.prop("date")
   ),
-  tarball: prop("tarball")
+  tarball: R.prop("tarball")
 });
 
-export const latestTags = applySpec({
+export const latestTags = R.applySpec({
   alpha: findAndSerialize(findAlpha),
   beta: findAndSerialize(findBeta),
   latest: findAndSerialize(findLatest)
 });
 
-export const serializeTags = applySpec({
+export const serializeTags = R.applySpec({
   alpha: findAndGetId(findAlpha),
   beta: findAndGetId(findBeta),
   latest: findAndGetId(findLatest)
 });
 
-export const serializeBranch = applySpec({
+export const serializeBranch = R.applySpec({
   displayId: getId,
   // TODO: add all this info
-  package: always(""),
+  package: R.always(""),
   artifact: {
-    time: always(""),
-    version: always(""),
-    tarball: always("")
+    time: R.always(""),
+    version: R.always(""),
+    tarball: R.always("")
   }
 });
 
 export const artifacts = (api, packageName) =>
-  api.allReleases(null, { packageName }).then(map(serializeRelease));
+  api.allReleases(null, { packageName }).then(R.map(serializeRelease));
 
 export const tags = (api, packageName) =>
   api.allReleaseTags(null, { packageName });
@@ -66,7 +60,7 @@ export const tags = (api, packageName) =>
 export const branches = (api, project, repo, credentials) =>
   api
     .allBranches(null, { project, repo }, { credentials })
-    .then(map(serializeBranch));
+    .then(R.map(serializeBranch));
 
 export function fetch(
   npm,
