@@ -12,11 +12,13 @@ export const findAndGetId = (predicate) =>
     getId,
     predicate
   );
+
 export const findAndSerialize = (predicate) =>
   R.compose(
     serializeRelease,
     predicate
   );
+
 export const toISOString = (x) => new Date(x).toISOString();
 
 export const serializeRelease = R.applySpec({

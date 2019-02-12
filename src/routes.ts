@@ -10,14 +10,17 @@ import {
 } from "./api/legacy-v1/v1Adapter";
 import { buildCredentials } from "./utils";
 
-const validate = (prop) =>
+const validate = (prop: string) =>
   R.ifElse(
     R.has(prop),
     R.always(null),
     R.always(`Parameter '${prop}' is missing.`)
   );
 
-const v1_dashboard = async (req, res) => {
+const v1_dashboard = async (
+  req: { query: { package: string; project: string; repo: string } },
+  res: { json: (obj: object) => void }
+) => {
   const errors = R.reject(R.isNil, [
     validate("package")(req.query),
     validate("project")(req.query),

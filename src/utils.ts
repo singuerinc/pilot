@@ -8,7 +8,7 @@ import cfg from "./config";
  */
 export const paramsToQuery = R.compose(
   R.join(""),
-  R.ifElse(R.length, R.prepend("?"), R.always([])),
+  R.ifElse(R.equals(1), R.prepend("?"), R.always([])),
   R.join("&"),
   R.map(R.join("=")),
   R.toPairs
@@ -24,18 +24,14 @@ export const headers = R.compose(
 
 /**
  * Creates a base 64 string with the username/password
- * @param {string} username
- * @param {string} password
  */
-export const buildCredentials = (username, password) =>
+export const buildCredentials = (username: string, password: string) =>
   Buffer.from(`${username}:${password}`, "ascii").toString("base64");
 
 /**
  * Returns the url to get the branches info
- * @param {string} project
- * @param {string} repo
  */
-export const branchesUrl = (project, repo) =>
+export const branchesUrl = (project: string, repo: string) =>
   R.compose(
     R.replace("%project%", project),
     R.replace("%repo%", repo)
@@ -43,13 +39,14 @@ export const branchesUrl = (project, repo) =>
 
 /**
  * Returns the url to get the commits info
- * @param {string} project
- * @param {string} repo
- * @param {object} options
  */
-export const commitsUrl = (project, repo, { limit }) =>
+export const commitsUrl = (
+  project: string,
+  repo: string,
+  { limit }: { limit: number }
+) =>
   R.compose(
-    R.concat(R.__, paramsToQuery({ limit })),
+    R.flip(R.concat)(paramsToQuery({ limit })),
     R.replace("%project%", project),
     R.replace("%repo%", repo)
   )(cfg.COMMITS_URL);
