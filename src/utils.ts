@@ -14,23 +14,27 @@ export const paramsToQuery = R.compose(
   R.toPairs
 );
 
-interface IHeaders {
-  headers: { common: { Authorization: string } };
+export interface IHeaders {
+  headers?: { common: { Authorization: string } };
 }
 
 /**
  * Creates a http header object
  */
-export const headers = R.compose<string, string, object>(
-  R.assocPath(["headers", "common", "Authorization"], R.__, {}),
-  R.concat("Basic ")
-);
+export function headers(x: string): IHeaders {
+  //@ts-ignore
+  return R.compose(
+    R.assocPath(["headers", "common", "Authorization"], R.__, {}),
+    R.concat("Basic ")
+  )(x);
+}
 
 /**
  * Creates a base 64 string with the username/password
  */
-export const buildCredentials = (username: string, password: string) =>
-  Buffer.from(`${username}:${password}`, "ascii").toString("base64");
+export function buildCredentials(username: string, password: string) {
+  return Buffer.from(`${username}:${password}`, "ascii").toString("base64");
+}
 
 /**
  * Returns the url to get the branches info

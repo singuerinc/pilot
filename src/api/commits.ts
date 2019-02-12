@@ -1,6 +1,7 @@
 import * as R from "ramda";
+import { IHeaders } from "../utils";
 
-interface ICommit {
+export interface ICommit {
   _id: string;
   date: string;
 }
@@ -11,7 +12,11 @@ export const serialize = R.applySpec<ICommit>({
   date: R.propOr(null, "authorTimestamp")
 });
 
-export const find = async (loadService, url: string, headers: string) => {
+export const find = async (
+  loadService,
+  url: string,
+  headers: IHeaders
+): Promise<ICommit[]> => {
   try {
     const { data } = await loadService(url, headers);
     return R.map(serialize, data.values);

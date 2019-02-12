@@ -15,15 +15,19 @@ export const npmConf = () => ({
   registry: cfg.NPM_REGISTRY
 });
 
-export const typeIsAlpha = R.compose(
-  R.equals("alpha"),
-  R.prop("type")
-);
+export function typeIsAlpha(release: IRelease) {
+  return R.compose<IRelease, string, boolean>(
+    R.equals("alpha"),
+    R.prop("type")
+  )(release);
+}
 
-export const typeIsBeta = R.compose(
-  R.equals("beta"),
-  R.prop("type")
-);
+export function typeIsBeta(release: IRelease) {
+  return R.compose<IRelease, string, boolean>(
+    R.equals("beta"),
+    R.prop("type")
+  )(release);
+}
 
 export const typeIsRelease = (x: IRelease) => !typeIsAlpha(x) && !typeIsBeta(x);
 export const isCreatedOrModified = (x: string) =>
@@ -58,7 +62,7 @@ export const serialize = R.curry(
  * Creates a serialized version of each tag.
  */
 export const parseReleaseTags = (
-  typeIsAlphaFn,
+  typeIsAlphaFn: (x: string) => boolean,
   versions: string[],
   timestamps: ITimestamp
 ) =>

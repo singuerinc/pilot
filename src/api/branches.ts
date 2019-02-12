@@ -1,4 +1,5 @@
 import * as R from "ramda";
+import { IHeaders } from "../utils";
 
 export interface IBranch {
   _id: string;
@@ -8,7 +9,11 @@ export const serialize = R.applySpec<IBranch>({
   _id: R.prop("displayId")
 });
 
-export const find = async (loadService, url: string, headers: string) => {
+export async function find(
+  loadService,
+  url: string,
+  headers: IHeaders
+): Promise<IBranch[]> {
   try {
     const { data } = await loadService(url, headers);
     const serialized = R.map(serialize, data.values);
@@ -16,4 +21,4 @@ export const find = async (loadService, url: string, headers: string) => {
   } catch (err) {
     return err;
   }
-};
+}

@@ -1,4 +1,4 @@
-import { resolvers } from "../resolvers";
+import { resolvers, API } from "../resolvers";
 jest.mock("../config");
 
 const npmStubGood = {
@@ -35,7 +35,7 @@ const axiosGetGood = {
 
 describe("resolvers", () => {
   describe("allBranches", () => {
-    let rlvs;
+    let rlvs: { Query: API };
     beforeEach(() => {
       rlvs = resolvers(npmStubGood, axiosGetGood);
     });

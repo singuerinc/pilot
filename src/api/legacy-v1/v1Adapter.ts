@@ -1,7 +1,41 @@
 import * as R from "ramda";
 import config from "../../config";
-import { resolvers } from "../../resolvers";
+import { resolvers, API } from "../../resolvers";
 import { typeIsAlpha, typeIsBeta, typeIsRelease } from "../releases";
+import { AxiosStatic } from "axios";
+
+export interface IBranchV1 {
+  displayId: string;
+  package: string;
+  artifact: {
+    time: string;
+    version: string;
+    tarball: string;
+  };
+}
+
+export interface IReleaseV1 {
+  time: string;
+  version: string;
+  tarball: string;
+}
+
+export interface ITag {
+  _id: string;
+  type: "alpha" | "beta" | "latest";
+}
+
+export interface ILatestTags {
+  alpha: ITag;
+  beta: ITag;
+  latest: ITag;
+}
+
+export interface ITags {
+  alpha: string;
+  beta: string;
+  latest: string;
+}
 
 export const getId = R.propOr("", "_id");
 export const findAlpha = R.find(typeIsAlpha);
@@ -19,9 +53,9 @@ export const findAndSerialize = (predicate) =>
     predicate
   );
 
-export const toISOString = (x) => new Date(x).toISOString();
+export const toISOString = (x: string) => new Date(x).toISOString();
 
-export const serializeRelease = R.applySpec({
+export const serializeRelease = R.applySpec<IReleaseV1>({
   version: R.prop("version"),
   time: R.compose(
     toISOString,
@@ -30,29 +64,19 @@ export const serializeRelease = R.applySpec({
   tarball: R.prop("tarball")
 });
 
-export const latestTags = R.applySpec({
+export const latestTags = R.applySpec<ILatestTags>({
   alpha: findAndSerialize(findAlpha),
   beta: findAndSerialize(findBeta),
   latest: findAndSerialize(findLatest)
 });
 
-export const serializeTags = R.applySpec({
+export const serializeTags = R.applySpec<ITags>({
   alpha: findAndGetId(findAlpha),
   beta: findAndGetId(findBeta),
   latest: findAndGetId(findLatest)
 });
 
-export interface IBranchV1 {
-  displayId: string;
-  package: string;
-  artifact: {
-    time: string;
-    version: string;
-    tarball: string;
-  };
-}
-
-export const serializeBranch = R.applySpec({
+export const serializeBranch = R.applySpec<IBranchV1>({
   displayId: getId,
   // TODO: add all this info
   package: R.always(""),
@@ -70,7 +94,7 @@ export const tags = (api, packageName: string) =>
   api.allReleaseTags(null, { packageName });
 
 export const branches = (
-  api,
+  api: API,
   project: string,
   repo: string,
   credentials: string
@@ -81,11 +105,11 @@ export const branches = (
 
 export function fetch(
   npm,
-  axios,
+  axios: AxiosStatic,
   artifacts,
   tags,
   branches,
-  buildCredentials,
+  buildCredentials: (username: string, password: string) => string,
   serializeTags,
   packageName: string,
   project: string,
