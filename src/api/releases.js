@@ -94,19 +94,6 @@ export const parseAllReleases = (isCreatedOrModifiedFn, versions, timestamps) =>
  * @param {string} name The package name
  */
 export const load = async (npm, name) => {
-  return new Promise((resolve, reject) => {
-    // TODO: move this npmConf to params
-    npm.load(npmConf(), () => {
-      // @ts-ignore
-      npm.commands.view([name], true, (err, res) => {
-        if (err) {
-          reject(err);
-        } else {
-          // Since the object has keys as index we need to extract the first one
-          const f = R.head(R.keys(res));
-          resolve(res[f]);
-        }
-      });
-    });
-  });
+  const res = await npm.packument(name);
+  return res;
 };

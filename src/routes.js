@@ -1,5 +1,5 @@
 import axios from "axios";
-import npm from "npm";
+import npm from "libnpm";
 import * as R from "ramda";
 import {
   artifacts,
