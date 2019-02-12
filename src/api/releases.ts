@@ -62,7 +62,7 @@ export const serialize = R.curry(
  * Creates a serialized version of each tag.
  */
 export const parseReleaseTags = (
-  typeIsAlphaFn: (x: string) => boolean,
+  typeIsAlphaFn: (x: IRelease) => boolean,
   versions: string[],
   timestamps: ITimestamp
 ) =>

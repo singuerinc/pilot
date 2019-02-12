@@ -106,10 +106,13 @@ define("api/commits", ["require", "exports", "ramda"], function (require, export
     "use strict";
     var _this = this;
     exports.__esModule = true;
-    exports.serialize = R.applySpec({
-        _id: R.prop("id"),
-        date: R.propOr(null, "authorTimestamp")
-    });
+    function serialize(x) {
+        return R.applySpec({
+            _id: R.prop("id"),
+            date: R.propOr(null, "authorTimestamp")
+        })(x);
+    }
+    exports.serialize = serialize;
     exports.find = function (loadService, url, headers) { return __awaiter(_this, void 0, void 0, function () {
         var data, err_2;
         return __generator(this, function (_a) {
@@ -119,7 +122,7 @@ define("api/commits", ["require", "exports", "ramda"], function (require, export
                     return [4, loadService(url, headers)];
                 case 1:
                     data = (_a.sent()).data;
-                    return [2, R.map(exports.serialize, data.values)];
+                    return [2, R.map(serialize, data.values)];
                 case 2:
                     err_2 = _a.sent();
                     return [2, err_2];
