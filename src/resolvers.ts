@@ -3,9 +3,26 @@ import * as Commits from "./api/commits";
 import * as Releases from "./api/releases";
 import { branchesUrl, commitsUrl, headers } from "./utils";
 
+interface IWithProjectAndRepo {
+  project: string;
+  repo: string;
+}
+
+interface IWithCredentials {
+  credentials: string;
+}
+
+interface IWithPackageName {
+  packageName: string;
+}
+
 export const resolvers = (npm, axios) => ({
   Query: {
-    async allBranches(_, { project, repo }, { credentials }) {
+    async allBranches(
+      _,
+      { project, repo }: IWithProjectAndRepo,
+      { credentials }: IWithCredentials
+    ) {
       return Branches.find(
         axios.get,
         branchesUrl(project, repo),
@@ -13,7 +30,11 @@ export const resolvers = (npm, axios) => ({
       );
     },
 
-    async allCommits(_, { project, repo }, { credentials }) {
+    async allCommits(
+      _,
+      { project, repo }: IWithProjectAndRepo,
+      { credentials }: IWithCredentials
+    ) {
       return Commits.find(
         axios.get,
         commitsUrl(project, repo, { limit: 50 }),
@@ -21,7 +42,7 @@ export const resolvers = (npm, axios) => ({
       );
     },
 
-    async allReleases(_, { packageName }) {
+    async allReleases(_, { packageName }: IWithPackageName) {
       try {
         const { versions, time } = await Releases.load(npm, packageName);
         return Releases.parseAllReleases(
@@ -35,7 +56,7 @@ export const resolvers = (npm, axios) => ({
       }
     },
 
-    async allReleaseTags(_, { packageName }) {
+    async allReleaseTags(_, { packageName }: IWithPackageName) {
       try {
         const { versions, time, ...data } = await Releases.load(
           npm,

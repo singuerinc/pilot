@@ -1,4 +1,4 @@
-import cors from "cors";
+import * as cors from "cors";
 import * as express from "express";
 import graphqlHTTP from "express-graphql";
 import cfg from "./config";

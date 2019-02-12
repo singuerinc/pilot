@@ -14,10 +14,14 @@ export const paramsToQuery = R.compose(
   R.toPairs
 );
 
+interface IHeaders {
+  headers: { common: { Authorization: string } };
+}
+
 /**
  * Creates a http header object
  */
-export const headers = R.compose(
+export const headers = R.compose<string, string, object>(
   R.assocPath(["headers", "common", "Authorization"], R.__, {}),
   R.concat("Basic ")
 );

@@ -42,6 +42,16 @@ export const serializeTags = R.applySpec({
   latest: findAndGetId(findLatest)
 });
 
+export interface IBranchV1 {
+  displayId: string;
+  package: string;
+  artifact: {
+    time: string;
+    version: string;
+    tarball: string;
+  };
+}
+
 export const serializeBranch = R.applySpec({
   displayId: getId,
   // TODO: add all this info
@@ -53,13 +63,18 @@ export const serializeBranch = R.applySpec({
   }
 });
 
-export const artifacts = (api, packageName) =>
+export const artifacts = (api, packageName: string) =>
   api.allReleases(null, { packageName }).then(R.map(serializeRelease));
 
-export const tags = (api, packageName) =>
+export const tags = (api, packageName: string) =>
   api.allReleaseTags(null, { packageName });
 
-export const branches = (api, project, repo, credentials) =>
+export const branches = (
+  api,
+  project: string,
+  repo: string,
+  credentials: string
+) =>
   api
     .allBranches(null, { project, repo }, { credentials })
     .then(R.map(serializeBranch));
@@ -72,9 +87,9 @@ export function fetch(
   branches,
   buildCredentials,
   serializeTags,
-  packageName,
-  project,
-  repo
+  packageName: string,
+  project: string,
+  repo: string
 ) {
   const api = resolvers(npm, axios).Query;
   const calls = Promise.all([

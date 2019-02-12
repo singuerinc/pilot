@@ -1,6 +1,16 @@
 import * as R from "ramda";
 import cfg from "../config";
 
+interface IRelease {
+  type: string;
+}
+
+interface ITimestamp {
+  created: string;
+  modified: string;
+  [version: string]: string;
+}
+
 export const npmConf = () => ({
   registry: cfg.NPM_REGISTRY
 });
@@ -15,8 +25,9 @@ export const typeIsBeta = R.compose(
   R.prop("type")
 );
 
-export const typeIsRelease = (x) => !typeIsAlpha(x) && !typeIsBeta(x);
-export const isCreatedOrModified = (x) => x === "created" || x === "modified";
+export const typeIsRelease = (x: IRelease) => !typeIsAlpha(x) && !typeIsBeta(x);
+export const isCreatedOrModified = (x: string) =>
+  x === "created" || x === "modified";
 
 /**
  * Returns the type of a release tag.
@@ -32,25 +43,25 @@ export const findTagType = R.cond([
 /**
  * Create an object version of a release mixing
  * timestamp, version, tag type, etc.
- * @param {string[]} versions
- * @param {object} timestamps
- * @param {object} version
  */
-export const serialize = R.curry((versions, timestamps, version) => ({
-  _id: version,
-  version,
-  date: new Date(timestamps[version]).getTime(),
-  tarball: "", //versions[tag].dist.tarball,
-  type: findTagType(version)
-}));
+export const serialize = R.curry(
+  (versions: string[], timestamps: ITimestamp, version: string) => ({
+    _id: version,
+    version,
+    date: new Date(timestamps[version]).getTime(),
+    tarball: "", //versions[tag].dist.tarball,
+    type: findTagType(version)
+  })
+);
 
 /**
  * Creates a serialized version of each tag.
- * @param {Function} typeIsAlphaFn
- * @param {string[]} versions
- * @param {object} timestamps
  */
-export const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
+export const parseReleaseTags = (
+  typeIsAlphaFn,
+  versions: string[],
+  timestamps: ITimestamp
+) =>
   R.compose(
     R.map(serialize(versions, timestamps)),
     R.reject(typeIsAlphaFn),
@@ -59,11 +70,12 @@ export const parseReleaseTags = (typeIsAlphaFn, versions, timestamps) =>
 
 /**
  * Creates a serialized version of each release.
- * @param {Function} isCreatedOrModifiedFn
- * @param {string[]} versions
- * @param {object} timestamps
  */
-export const parseAllReleases = (isCreatedOrModifiedFn, versions, timestamps) =>
+export const parseAllReleases = (
+  isCreatedOrModifiedFn,
+  versions: string[],
+  timestamps: ITimestamp
+) =>
   R.compose(
     R.sortWith([R.descend(R.prop("date"))]),
     R.map(serialize(versions, timestamps)),
@@ -90,10 +102,8 @@ export const parseAllReleases = (isCreatedOrModifiedFn, versions, timestamps) =>
  *     },
  *   }
  * }
- * @param {*} npm
- * @param {string} name The package name
  */
-export const load = async (npm, name) => {
+export const load = async (npm, name: string) => {
   const res = await npm.packument(name);
   return res;
 };
