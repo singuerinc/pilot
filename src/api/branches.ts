@@ -1,5 +1,6 @@
 import * as R from "ramda";
 import { IHeaders } from "../utils";
+import { ILoadService } from "./commits";
 
 export interface IBranch {
   _id: string;
@@ -10,7 +11,7 @@ export const serialize = R.applySpec<IBranch>({
 });
 
 export async function find(
-  loadService,
+  loadService: ILoadService,
   url: string,
   headers: IHeaders
 ): Promise<IBranch[]> {

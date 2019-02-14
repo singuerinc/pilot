@@ -104,13 +104,18 @@ export const branches = (
     .then(R.map(serializeBranch));
 
 export function fetch(
-  npm,
+  npm: any,
   axios: AxiosStatic,
-  artifacts,
-  tags,
-  branches,
+  artifacts: (api: API, packageName: string) => Promise<any>,
+  tags: (api: API, packageName: string) => Promise<any>,
+  branches: (
+    api: API,
+    project: string,
+    repo: string,
+    buildCredentials: string
+  ) => Promise<any>,
   buildCredentials: (username: string, password: string) => string,
-  serializeTags,
+  serializeTags: (...args: any[]) => ITags,
   packageName: string,
   project: string,
   repo: string

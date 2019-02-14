@@ -37,6 +37,7 @@ describe("resolvers", () => {
   describe("allBranches", () => {
     let rlvs: { Query: API };
     beforeEach(() => {
+      //@ts-ignore
       rlvs = resolvers(npmStubGood, axiosGetGood);
     });
 

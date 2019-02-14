@@ -34,6 +34,7 @@ export interface API {
   allReleaseTags: (a: any, b: IWithPackageName) => Promise<any>;
 }
 
+//@ts-ignore
 export function resolvers(npm, axios: AxiosStatic): { Query: API } {
   return {
     Query: {
