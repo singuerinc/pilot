@@ -52,11 +52,11 @@ describe("commits", () => {
       const expected = [
         {
           _id: "6bbe9aab7f181b919c884c25c468e7335bed47f5",
-          date: 149261208
+          date: "149261208"
         },
         {
           _id: "c10483a950c77565f8a4b7e533cb38fffc5b15d4",
-          date: 149260311
+          date: "149260311"
         }
       ];
 
