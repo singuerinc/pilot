@@ -1,7 +1,10 @@
 module.exports = {
-  rootDir: "./src/",
-  moduleFileExtensions: ["js"],
-  testMatch: ["**/__tests__/*.(test|spec).js"],
+  roots: ["<rootDir>/src"],
+  transform: {
+    "^.+\\.tsx?$": "ts-jest"
+  },
+  testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   collectCoverage: true,
   collectCoverageFrom: ["**/*.{js,jsx}", "!**/node_modules/**"],
   coverageDirectory: "../coverage"
