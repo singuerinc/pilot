@@ -1,7 +1,7 @@
 import * as R from "ramda";
 import config from "../../config";
 import { resolvers, API } from "../../resolvers";
-import { typeIsAlpha, typeIsBeta, typeIsRelease } from "../releases";
+import { typeIsAlpha, typeIsBeta, typeIsRelease, IRelease } from "../releases";
 import { AxiosStatic } from "axios";
 
 export interface IBranchV1 {
@@ -41,13 +41,13 @@ export const getId = R.propOr("", "_id");
 export const findAlpha = R.find(typeIsAlpha);
 export const findBeta = R.find(typeIsBeta);
 export const findLatest = R.find(typeIsRelease);
-export const findAndGetId = (predicate) =>
+export const findAndGetId = (predicate: (list: IRelease[]) => IRelease) =>
   R.compose(
     getId,
     predicate
   );
 
-export const findAndSerialize = (predicate) =>
+export const findAndSerialize = (predicate: (list: IRelease[]) => IRelease) =>
   R.compose(
     serializeRelease,
     predicate
@@ -87,10 +87,10 @@ export const serializeBranch = R.applySpec<IBranchV1>({
   }
 });
 
-export const artifacts = (api, packageName: string) =>
+export const artifacts = (api: API, packageName: string) =>
   api.allReleases(null, { packageName }).then(R.map(serializeRelease));
 
-export const tags = (api, packageName: string) =>
+export const tags = (api: API, packageName: string) =>
   api.allReleaseTags(null, { packageName });
 
 export const branches = (

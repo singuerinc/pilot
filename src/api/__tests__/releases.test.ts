@@ -44,7 +44,11 @@ describe("releases", () => {
       expect(
         serialize(
           ["1.0.0", "1.0.1", "1.1.0"],
-          { "1.0.1": "2018-05-18T11:17:35.529Z" },
+          {
+            created: "2018-05-18T09:01:38.604Z",
+            "1.0.1": "2018-05-18T11:17:35.529Z",
+            modified: "2018-05-18T09:01:38.604Z"
+          },
           "1.0.1"
         )
       ).toStrictEqual({
@@ -60,9 +64,9 @@ describe("releases", () => {
   describe("load", async () => {
     it("should load all releases", async () => {
       const npmStubGood = {
-        load: (_1, callback) => callback(),
+        load: (_1: any, callback: any) => callback(),
         commands: {
-          view: (_2, _3, callback) =>
+          view: (_2: any, _3: any, callback: any) =>
             callback(null, {
               "0.0.1": {
                 "dist-tags": {},
@@ -84,9 +88,10 @@ describe("releases", () => {
 
     it("should fail to load releases", async () => {
       const npmStubBad = {
-        load: (_1, callback) => callback(),
+        load: (_1: any, callback: any) => callback(),
         commands: {
-          view: (_2, _3, callback) => callback(new Error("error!"))
+          view: (_2: any, _3: any, callback: any) =>
+            callback(new Error("error!"))
         }
       };
 

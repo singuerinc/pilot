@@ -2,9 +2,9 @@ import { resolvers, API } from "../resolvers";
 jest.mock("../config");
 
 const npmStubGood = {
-  load: (_1, callback) => callback(),
+  load: (_1: any, callback: any) => callback(),
   commands: {
-    view: (_2, _3, callback) =>
+    view: (_2: any, _3: any, callback: any) =>
       callback(null, {
         "0.0.1": {
           "dist-tags": {},

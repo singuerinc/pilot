@@ -1,4 +1,5 @@
-import { find, serialize } from "../commits";
+import { find, serialize, ILoadService } from "../commits";
+import { IHeaders } from "../../utils";
 
 describe("commits", () => {
   describe("serialize", () => {
@@ -34,16 +35,17 @@ describe("commits", () => {
         values: [
           {
             id: "6bbe9aab7f181b919c884c25c468e7335bed47f5",
-            authorTimestamp: 149261208
+            authorTimestamp: "149261208"
           },
           {
             id: "c10483a950c77565f8a4b7e533cb38fffc5b15d4",
-            authorTimestamp: 149260311
+            authorTimestamp: "149260311"
           }
         ]
       };
 
       const axiosGetStubGood = () => Promise.resolve({ data: response });
+
       const url = "https://foo.bar";
       const headers = {};
 

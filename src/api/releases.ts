@@ -1,7 +1,7 @@
 import * as R from "ramda";
 import cfg from "../config";
 
-interface IRelease {
+export interface IRelease {
   type: string;
 }
 

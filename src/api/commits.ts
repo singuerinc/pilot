@@ -1,7 +1,7 @@
 import * as R from "ramda";
 import { IHeaders } from "../utils";
 
-type ILoadService = (
+export type ILoadService = (
   url: string,
   headers: IHeaders
 ) => Promise<{ data: { values: IRawCommit[] } }>;
@@ -11,9 +11,9 @@ export interface ICommit {
   date: string;
 }
 
-interface IRawCommit {
+export interface IRawCommit {
   id: string;
-  authorTimestamp: string;
+  authorTimestamp?: string;
 }
 
 // TODO: be sure that we can return null for date
