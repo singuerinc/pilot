@@ -31,5 +31,6 @@ const typeDefs = `
 
 export default makeExecutableSchema({
   typeDefs,
+  //@ts-ignore
   resolvers: resolvers(npm, axios)
 });

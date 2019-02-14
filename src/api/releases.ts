@@ -68,6 +68,7 @@ export const parseReleaseTags = (
 ) =>
   R.compose(
     R.map(serialize(versions, timestamps)),
+    // @ts-ignore
     R.reject(typeIsAlphaFn),
     R.values
   );
@@ -76,13 +77,14 @@ export const parseReleaseTags = (
  * Creates a serialized version of each release.
  */
 export const parseAllReleases = (
-  isCreatedOrModifiedFn,
+  isCreatedOrModifiedFn: (x: string) => boolean,
   versions: string[],
   timestamps: ITimestamp
 ) =>
   R.compose(
     R.sortWith([R.descend(R.prop("date"))]),
     R.map(serialize(versions, timestamps)),
+    // @ts-ignore
     R.reject(isCreatedOrModifiedFn),
     R.keys
   );
@@ -107,7 +109,7 @@ export const parseAllReleases = (
  *   }
  * }
  */
-export const load = async (npm, name: string) => {
+export const load = async (npm: any, name: string) => {
   const res = await npm.packument(name);
   return res;
 };

@@ -139,6 +139,7 @@ describe("v1Adapter", () => {
         allReleases: () => Promise.resolve(allArtifacts)
       };
 
+      // @ts-ignore
       expect(artifacts(apiStubGood, "foo")).resolves.toStrictEqual([
         {
           tarball: "",
@@ -182,6 +183,7 @@ describe("v1Adapter", () => {
         allReleaseTags: () => Promise.resolve(allTags)
       };
 
+      // @ts-ignore
       expect(tags(apiStubGood, "foo")).resolves.toStrictEqual([
         {
           _id: "1.0.0",
@@ -215,6 +217,7 @@ describe("v1Adapter", () => {
       };
 
       expect(
+        // @ts-ignore
         branches(apiStubGood, "project", "repo", {})
       ).resolves.toStrictEqual([
         {
@@ -298,6 +301,7 @@ describe("v1Adapter", () => {
       expect(
         fetch(
           npmStubGood,
+          // @ts-ignore
           axiosStubGood,
           artifactsStub,
           tagsStub,
@@ -385,6 +389,7 @@ describe("v1Adapter", () => {
 
       const { error } = await fetch(
         npmStubGood,
+        // @ts-ignore
         axiosStubGood,
         artifactsStub,
         tagsStub,
