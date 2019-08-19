@@ -1,10 +1,10 @@
-import { IBranch } from "./api/branches";
+import { AxiosStatic } from "axios";
 import * as Branches from "./api/branches";
+import { IBranch } from "./api/branches";
 import * as Commits from "./api/commits";
 import { ICommit } from "./api/commits";
 import * as Releases from "./api/releases";
 import { branchesUrl, commitsUrl, headers } from "./utils";
-import { AxiosStatic } from "axios";
 
 interface IWithProjectAndRepo {
   project: string;

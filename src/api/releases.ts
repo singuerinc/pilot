@@ -48,15 +48,17 @@ export const findTagType = R.cond([
  * Create an object version of a release mixing
  * timestamp, version, tag type, etc.
  */
-export const serialize = R.curry(
-  (versions: string[], timestamps: ITimestamp, version: string) => ({
-    _id: version,
-    version,
-    date: new Date(timestamps[version]).getTime(),
-    tarball: "", //versions[tag].dist.tarball,
-    type: findTagType(version)
-  })
-);
+export const serialize = (
+  versions: string[],
+  timestamps: ITimestamp,
+  version: string
+) => ({
+  _id: version,
+  version,
+  date: new Date(timestamps[version]).getTime(),
+  tarball: "", //versions[tag].dist.tarball,
+  type: findTagType(version)
+});
 
 /**
  * Creates a serialized version of each tag.
@@ -65,13 +67,21 @@ export const parseReleaseTags = (
   typeIsAlphaFn: (x: IRelease) => boolean,
   versions: string[],
   timestamps: ITimestamp
-) =>
-  R.compose(
-    R.map(serialize(versions, timestamps)),
-    // @ts-ignore
-    R.reject(typeIsAlphaFn),
-    R.values
-  );
+) => (
+  values: { type: string }[]
+): {
+  _id: string;
+  version: string;
+  date: number;
+  tarball: string;
+  type: string;
+}[] => {
+  const a = R.values(values);
+  const b = R.reject(typeIsAlphaFn, a);
+  //@ts-ignore
+  const c = R.map((x) => serialize(versions, timestamps, x), b);
+  return c;
+};
 
 /**
  * Creates a serialized version of each release.
@@ -83,8 +93,8 @@ export const parseAllReleases = (
 ) =>
   R.compose(
     R.sortWith([R.descend(R.prop("date"))]),
-    R.map(serialize(versions, timestamps)),
     // @ts-ignore
+    R.map((x) => serialize(versions, timestamps, x)),
     R.reject(isCreatedOrModifiedFn),
     R.keys
   );
@@ -109,7 +119,4 @@ export const parseAllReleases = (
  *   }
  * }
  */
-export const load = async (npm: any, name: string) => {
-  const res = await npm.packument(name);
-  return res;
-};
+export const load = async (npm: any, name: string) => await npm.packument(name);

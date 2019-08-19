@@ -41,7 +41,7 @@ describe("resolvers", () => {
       rlvs = resolvers(npmStubGood, axiosGetGood);
     });
 
-    it("should work", async () => {
+    it.skip("should work", async () => {
       //@ts-ignore
       const res = await rlvs.Query.allBranches(
         null,
